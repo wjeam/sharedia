@@ -6,6 +6,8 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Identity.Web;
 using Microsoft.OpenApi.Models;
+using MongoDB.Driver;
+using sharedia.Services;
 
 namespace sharedia
 {
@@ -21,6 +23,22 @@ namespace sharedia
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            // TODO: Use configuration section
+            services.AddSingleton<IMongoClient>(sp =>
+            {
+                var connectionString = "mongodb://localhost:27017/";
+                return new MongoClient(connectionString);
+            });
+
+            services.AddScoped(sp =>
+            {
+                var client = sp.GetRequiredService<IMongoClient>();
+                var database = "sharedia";
+                return client.GetDatabase(database);
+            });
+
+            services.AddScoped<PostService>();
+
             services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
                 .AddMicrosoftIdentityWebApi(Configuration.GetSection("AzureAd"));
 
@@ -45,7 +63,9 @@ namespace sharedia
 
             app.UseRouting();
 
+            // TODO: Setup AzureAD authentication
             app.UseAuthentication();
+
             app.UseAuthorization();
 
             app.UseEndpoints(endpoints =>
