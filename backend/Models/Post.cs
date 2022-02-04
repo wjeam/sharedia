@@ -1,5 +1,6 @@
 ﻿using MongoDB.Bson;
 using MongoDB.Bson.Serialization.Attributes;
+using Newtonsoft.Json;
 using System;
 
 namespace sharedia.Models
@@ -23,5 +24,10 @@ namespace sharedia.Models
         public string MediaId { get; set; }
         [BsonElement("userId")]
         public string UserId { get; set; }
+
+        public override string ToString()
+        {
+            return JsonConvert.SerializeObject(this);
+        }
     }
 }
