@@ -15,6 +15,7 @@ namespace sharedia
                 .ConfigureWebHostDefaults(webBuilder =>
                 {
                     webBuilder.UseStartup<Startup>();
+                    webBuilder.UseUrls("https://*:4131", "http://*:4132");
                 });
     }
 }

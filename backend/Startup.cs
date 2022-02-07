@@ -7,6 +7,7 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.Identity.Web;
 using Microsoft.OpenApi.Models;
 using MongoDB.Driver;
+using MongoDB.Driver.GridFS;
 using sharedia.Services;
 
 namespace sharedia
@@ -30,6 +31,13 @@ namespace sharedia
                 return new MongoClient(connectionString);
             });
 
+            services.AddSingleton<IGridFSBucket>(sp =>
+            {
+                var client = sp.GetRequiredService<IMongoClient>();
+                var database = "sharedia";
+                return new GridFSBucket(client.GetDatabase("sharedia"));
+            });
+
             services.AddScoped(sp =>
             {
                 var client = sp.GetRequiredService<IMongoClient>();
@@ -38,6 +46,19 @@ namespace sharedia
             });
 
             services.AddScoped<PostService>();
+            services.AddScoped<MediaService>();
+
+            services.AddCors(options =>
+            {
+                options.AddDefaultPolicy(
+                    builder =>
+                    {
+                        builder.AllowAnyOrigin()
+                        .AllowAnyHeader()
+                        .AllowAnyMethod();
+                    }
+               );
+            });
 
             services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
                 .AddMicrosoftIdentityWebApi(Configuration.GetSection("AzureAd"));
@@ -62,6 +83,8 @@ namespace sharedia
             app.UseHttpsRedirection();
 
             app.UseRouting();
+
+            app.UseCors();
 
             // TODO: Setup AzureAD authentication
             app.UseAuthentication();

@@ -12,6 +12,8 @@ namespace sharedia.Models
         public string Id { get; set; }
         [BsonElement("title")]
         public string Title { get; set; }
+        [BsonElement("description")]
+        public string Description { get; set; }
         [BsonElement("like")]
         public int Like { get; set; } = 0;
         [BsonElement("dislike")]
@@ -21,8 +23,10 @@ namespace sharedia.Models
         [BsonElement("isAdult")]
         public bool IsAdult { get; set; } = false;
         [BsonElement("mediaId")]
+        [BsonRepresentation(BsonType.ObjectId)]
         public string MediaId { get; set; }
         [BsonElement("userId")]
+        [BsonRepresentation(BsonType.ObjectId)]
         public string UserId { get; set; }
 
         public override string ToString()
