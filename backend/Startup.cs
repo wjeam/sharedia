@@ -46,7 +46,6 @@ namespace sharedia
             });
 
             services.AddScoped<PostService>();
-            services.AddScoped<MediaService>();
 
             services.AddCors(options =>
             {

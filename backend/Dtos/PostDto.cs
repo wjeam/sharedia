@@ -1,4 +1,5 @@
 ﻿using MongoDB.Bson;
+using sharedia.Models;
 using System;
 
 namespace sharedia.Dtos
@@ -12,7 +13,10 @@ namespace sharedia.Dtos
         public int Dislike { get; set; }
         public DateTime CreationDateTime { get; set; }
         public bool IsAdult { get; set; }
-        public string MediaId { get; set; }
         public string UserId { get; set; }
+        public string UID { get; set; }
+        public string FileType { get; set; }
+        public string FileName { get; set; }
+        public MediaType MediaType { get; set; }
     }
 }

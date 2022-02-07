@@ -22,12 +22,17 @@ namespace sharedia.Models
         public DateTime CreationDateTime { get; set; } =  DateTime.Now;
         [BsonElement("isAdult")]
         public bool IsAdult { get; set; } = false;
-        [BsonElement("mediaId")]
-        [BsonRepresentation(BsonType.ObjectId)]
-        public string MediaId { get; set; }
         [BsonElement("userId")]
         [BsonRepresentation(BsonType.ObjectId)]
         public string UserId { get; set; }
+        [BsonElement("fileName")]
+        public string FileName { get; set; }
+        [BsonElement("uid")]
+        public string UID { get; set; }
+        [BsonElement("fileId")]
+        public string FileType { get; set; }
+        [BsonElement("mediaType")]
+        public MediaType MediaType{ get; set; }
 
         public override string ToString()
         {

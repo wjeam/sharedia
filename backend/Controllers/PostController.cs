@@ -5,6 +5,7 @@ using sharedia.Dtos;
 using sharedia.Models;
 using sharedia.Services;
 using System;
+using System.IO;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -15,43 +16,29 @@ namespace sharedia.Controllers
     public class PostController : ControllerBase
     {
         private readonly PostService _postService;
-        private readonly MediaService _mediaService;
         private const string _storagePath = @"C:\sharedia";
 
-        public PostController(PostService postService, MediaService mediaService)
+        public PostController(PostService postService)
         {
             _postService = postService;
-            _mediaService = mediaService;
         }
 
-        // SERVICE LOGIC
-        private async Task CreatePostAsync(IFormCollection form, string mediaId)
+        private async Task<PostDto> CreatePostAsync(IFormCollection form, string UID)
         {
             var postDto = new PostDto()
             {
                 Title = form["title"],
                 Description = form["description"],
                 IsAdult = Boolean.Parse(form["isAdult"]),
-                MediaId = mediaId,
-                UserId = "###"
+                UserId = "###",
+                FileName = form["fileName"],
+                FileType = form["fileType"],
+                MediaType = (MediaType)Enum.Parse(typeof(MediaType), form["mediaType"]),
+                UID = UID,
             };
 
             await _postService.CreatePostAsync(postDto);
-        }
-
-        // SERVICE LOGIC
-        private async Task<string> CreateMediaAsync(IFormCollection form, string filePath)
-        {
-            var media = new Media()
-            {
-                Filename = form["filename"],
-                Filetype = form["fileType"],
-                MediaType = (MediaType)Enum.Parse(typeof(MediaType), form["mediaType"]),
-                FilePath = filePath,
-            };
-
-            var id = await _mediaService.InsertMediaAsync(media);
-            return id;
+            return postDto;
         }
 
         // REFACTOR
@@ -61,15 +48,14 @@ namespace sharedia.Controllers
             var file = Request.Form.Files[0];
             var form = Request.Form;
 
-            var filePath = Guid.NewGuid().ToString();
+            var UID = Guid.NewGuid().ToString();
             var newFilePath = new StringBuilder();
 
-            var mediaId = await CreateMediaAsync(form, filePath);
-            await CreatePostAsync(form, mediaId);
+            var postDto = await CreatePostAsync(form, UID);
 
             newFilePath.Append(_storagePath);
             newFilePath.Append("/");
-            newFilePath.Append(filePath);
+            newFilePath.Append(UID);
             newFilePath.Append(".");
             newFilePath.Append(form["fileType"]);
 
@@ -79,7 +65,7 @@ namespace sharedia.Controllers
             }
 
             // REMOVE HARDCODED 
-            return Created("https://localhost:4131/media/" + mediaId, null);
+            return Created("https://localhost:4131/post/media/" + postDto.Id, null);
         }
 
         [HttpGet("user/{id}")]
@@ -101,6 +87,17 @@ namespace sharedia.Controllers
         {
             var posts = await _postService.GetAdultPostsAsync();
             return Ok(posts);
+        }
+
+        [HttpGet("media/{id}")]
+        public async Task<FileResult> GetMediaAsync(string id)
+        {
+            var post = await _postService.GetPostAsync(id);
+            var stream = new FileStream(_storagePath + "/" + post.UID + "." + post.FileType, FileMode.Open, FileAccess.ReadWrite, FileShare.None, 4096, FileOptions.Asynchronous);
+            var fileStreamResult = new FileStreamResult(stream, post.MediaType.ToString().ToLower() + "/" + post.FileType);
+            fileStreamResult.EnableRangeProcessing = true;
+
+            return fileStreamResult;
         }
 
         [HttpGet("all")]

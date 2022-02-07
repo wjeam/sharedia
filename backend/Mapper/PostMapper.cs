@@ -12,12 +12,15 @@ namespace sharedia.Mapper
             postDto.Id = post.Id;
             postDto.Title = post.Title;
             postDto.Description = post.Description;
-            postDto.MediaId = post.MediaId;
             postDto.UserId = post.UserId;
             postDto.CreationDateTime = post.CreationDateTime;
             postDto.IsAdult = post.IsAdult;
             postDto.Dislike = post.Dislike;
             postDto.Like = post.Like;
+            postDto.UID = post.UID;
+            postDto.FileType = post.FileType;
+            postDto.FileName = post.FileName;
+            postDto.MediaType = post.MediaType;
 
             return postDto;
         }
@@ -29,7 +32,10 @@ namespace sharedia.Mapper
             post.Title = postDto.Title;
             post.Description = postDto.Description;
             post.IsAdult = postDto.IsAdult;
-            post.MediaId = postDto.MediaId;
+            post.MediaType = postDto.MediaType;
+            post.UID = postDto.UID;
+            post.FileName = postDto.FileName;
+            post.FileType = postDto.FileType;
 
             return post;
         }

@@ -91,10 +91,10 @@ const Home = () => {
     axios({
       method: "GET",
       responseType: "arraybuffer",
-      url: "https://localhost:4131/media/" + id,
+      url: "https://localhost:4131/post/media/" + id,
     })
       .then((response: AxiosResponse) => {
-        setUrl("https://localhost:4131/media/" + id);
+        setUrl("https://localhost:4131/post/media/" + id);
       })
       .catch((error: AxiosError) => {
         console.error(error);
@@ -177,8 +177,20 @@ const Home = () => {
         return (
           <>
             <h3 style={{ lineHeight: 0 }}>title: {post.title}</h3>
-            <h4>description: {post.description}</h4>
-            <img src={`https://localhost:4131/media/${post.mediaId}`} />
+            <h4 style={{ lineHeight: 0 }}>description: {post.description}</h4>
+            <h4 style={{ lineHeight: 0 }}>
+              fileName: {post.fileName + "." + post.fileType}
+            </h4>
+            {post.mediaType === 1 ? (
+              <img src={`https://localhost:4131/post/media/${post.id}`} />
+            ) : (
+              <video width={300} height={300} controls>
+                <source
+                  src={`https://localhost:4131/post/media/${post.id}`}
+                  type={"video/" + post.fileType}
+                />
+              </video>
+            )}
           </>
         );
       })}
