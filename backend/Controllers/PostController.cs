@@ -41,6 +41,18 @@ namespace sharedia.Controllers
             return postDto;
         }
 
+        [HttpPost("like")]
+        public async Task<IActionResult> LikePostAsync()
+        {
+            return Ok(":)");
+        }
+
+        [HttpPost("dislike")]
+        public async Task<IActionResult> DislikePostAsync()
+        {
+            return Ok(":)");
+        }
+
         // REFACTOR
         [HttpPost("create")]
         public async Task<IActionResult> CreatePostAsync()
@@ -64,7 +76,7 @@ namespace sharedia.Controllers
                 await file.CopyToAsync(stream);
             }
 
-            // REMOVE HARDCODED 
+            // REMOVE HARDCODED
             return Created("https://localhost:4131/post/media/" + postDto.Id, null);
         }
 
