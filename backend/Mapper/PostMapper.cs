@@ -7,12 +7,12 @@ namespace sharedia.Mapper
     {
         public static PostDto ToDto(Post post)
         {
-            PostDto postDto = new PostDto(); 
+            PostDto postDto = new PostDto();
 
             postDto.Id = post.Id;
             postDto.Title = post.Title;
             postDto.Description = post.Description;
-            postDto.UserId = post.UserId;
+            postDto.UserEmail = post.UserEmail;
             postDto.CreationDateTime = post.CreationDateTime;
             postDto.IsAdult = post.IsAdult;
             postDto.Dislike = post.Dislike;
@@ -33,6 +33,7 @@ namespace sharedia.Mapper
             post.Description = postDto.Description;
             post.IsAdult = postDto.IsAdult;
             post.MediaType = postDto.MediaType;
+            post.UserEmail = postDto.UserEmail;
             post.UID = postDto.UID;
             post.FileName = postDto.FileName;
             post.FileType = postDto.FileType;

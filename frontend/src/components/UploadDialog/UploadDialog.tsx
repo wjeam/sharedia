@@ -12,12 +12,13 @@ import axios, { AxiosResponse, AxiosError } from "axios";
 import React, { useState, FC } from "react";
 import { IPost } from "../../models/IPost";
 
-const UploadDialog: FC<any> = ({ open, toggleOpen }) => {
+const UploadDialog: FC<any> = ({ open, toggleOpen, isAdult, loggedUser }) => {
   const [form, setForm] = React.useState<IPost>({
     description: "",
     title: "",
     isAdult: false,
     file: new Blob(),
+    userEmail: "",
     fileName: "",
     fileType: "",
     mediaType: "",
@@ -30,10 +31,10 @@ const UploadDialog: FC<any> = ({ open, toggleOpen }) => {
     }));
   };
 
-  const handleCheckbox = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleCheckbox = (e: any) => {
     setForm((form: any) => ({
       ...form,
-      [e.target.id]: e.target.checked === false ? true : false,
+      [e.target.id]: e.target.checked,
     }));
   };
 
@@ -54,6 +55,7 @@ const UploadDialog: FC<any> = ({ open, toggleOpen }) => {
 
   const upload = () => {
     const formData = formToFormData();
+
     axios({
       method: "POST",
       data: formData,
@@ -61,7 +63,7 @@ const UploadDialog: FC<any> = ({ open, toggleOpen }) => {
       url: "https://localhost:4131/post/create",
     })
       .then((response: AxiosResponse) => {
-        console.log(response);
+        window.location.reload();
         toggleOpen(false);
       })
       .catch((error: AxiosError) => {
@@ -80,12 +82,9 @@ const UploadDialog: FC<any> = ({ open, toggleOpen }) => {
     for (const [key, value] of Object.entries(form)) {
       formData.append(key, value);
     }
+    formData.append("userEmail", loggedUser?.username);
     return formData;
   };
-
-  React.useEffect(() => {
-    console.log(form);
-  }, [form]);
 
   return (
     <Dialog open={open} onClose={handleBackdropClick}>
@@ -109,12 +108,15 @@ const UploadDialog: FC<any> = ({ open, toggleOpen }) => {
           fullWidth
           variant="standard"
         />
-        <FormControlLabel
-          control={<Checkbox id="isAdult" onChange={handleCheckbox} />}
-          value={form.isAdult === true ? "off" : "on"}
-          label="Is adult?"
-          sx={{ display: "block" }}
-        />
+        {isAdult && isAdult == true && (
+          <FormControlLabel
+            control={<Checkbox id="isAdult" />}
+            value={form.isAdult === true ? "off" : "on"}
+            onChange={handleCheckbox}
+            label="Is adult?"
+            sx={{ display: "block" }}
+          />
+        )}
         <input
           style={{ display: "none" }}
           id="file-upload"
@@ -130,12 +132,15 @@ const UploadDialog: FC<any> = ({ open, toggleOpen }) => {
           sx={{ backgroundColor: "red" }}
           variant="contained"
           onClick={upload}
+          disabled={!form.fileName}
         >
           Upload
         </Button>
-        <Typography sx={{ display: "block", mt: 2 }}>
-          File: {form.fileName + "." + form.fileType}
-        </Typography>
+        {form.fileName && (
+          <Typography sx={{ display: "block", mt: 2 }}>
+            File: {form.fileName + "." + form.fileType}
+          </Typography>
+        )}
       </DialogContent>
     </Dialog>
   );

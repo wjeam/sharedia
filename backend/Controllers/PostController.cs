@@ -1,6 +1,5 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using MongoDB.Driver.GridFS;
 using sharedia.Dtos;
 using sharedia.Models;
 using sharedia.Services;
@@ -16,7 +15,7 @@ namespace sharedia.Controllers
     public class PostController : ControllerBase
     {
         private readonly PostService _postService;
-        private const string _storagePath = @"C:\sharedia";
+        private const string StoragePath = @"C:\sharedia";
 
         public PostController(PostService postService)
         {
@@ -25,12 +24,12 @@ namespace sharedia.Controllers
 
         private async Task<PostDto> CreatePostAsync(IFormCollection form, string UID)
         {
-            var postDto = new PostDto()
+            var postDto = new PostDto
             {
                 Title = form["title"],
                 Description = form["description"],
-                IsAdult = Boolean.Parse(form["isAdult"]),
-                UserId = "###",
+                IsAdult = bool.Parse(form["isAdult"]),
+                UserEmail = form["userEmail"],
                 FileName = form["fileName"],
                 FileType = form["fileType"],
                 MediaType = (MediaType)Enum.Parse(typeof(MediaType), form["mediaType"]),
@@ -42,15 +41,17 @@ namespace sharedia.Controllers
         }
 
         [HttpPost("like")]
-        public async Task<IActionResult> LikePostAsync()
+        public async Task<IActionResult> LikePostAsync(string postId, string userEmail)
         {
-            return Ok(":)");
+            await _postService.LikePostAsync(postId, userEmail);
+            return Ok();
         }
 
         [HttpPost("dislike")]
-        public async Task<IActionResult> DislikePostAsync()
+        public async Task<IActionResult> DislikePostAsync(string postId, string userEmail)
         {
-            return Ok(":)");
+            await _postService.DislikePostAsync(postId, userEmail);
+            return Ok();
         }
 
         // REFACTOR
@@ -65,7 +66,7 @@ namespace sharedia.Controllers
 
             var postDto = await CreatePostAsync(form, UID);
 
-            newFilePath.Append(_storagePath);
+            newFilePath.Append(StoragePath);
             newFilePath.Append("/");
             newFilePath.Append(UID);
             newFilePath.Append(".");
@@ -81,9 +82,9 @@ namespace sharedia.Controllers
         }
 
         [HttpGet("user/{id}")]
-        public async Task<IActionResult> GetPostsByUserIdAsync(string id)
+        public async Task<IActionResult> GetPostsByUserIdAsync(string email)
         {
-            var posts = await _postService.GetPostsByUserIdAsync(id);
+            var posts = await _postService.GetPostsByUserEmailAsync(email);
             return Ok(posts);
         }
 
@@ -105,7 +106,7 @@ namespace sharedia.Controllers
         public async Task<FileResult> GetMediaAsync(string id)
         {
             var post = await _postService.GetPostAsync(id);
-            var stream = new FileStream(_storagePath + "/" + post.UID + "." + post.FileType, FileMode.Open, FileAccess.ReadWrite, FileShare.None, 4096, FileOptions.Asynchronous);
+            var stream = new FileStream(StoragePath + "/" + post.UID + "." + post.FileType, FileMode.Open, FileAccess.ReadWrite, FileShare.None, 4096, FileOptions.Asynchronous);
             var fileStreamResult = new FileStreamResult(stream, post.MediaType.ToString().ToLower() + "/" + post.FileType);
             fileStreamResult.EnableRangeProcessing = true;
 

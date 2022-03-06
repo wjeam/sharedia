@@ -14,7 +14,7 @@ namespace sharedia.Dtos
         public ConcurrentDictionary<string, byte> Dislike { get; set; }
         public DateTime CreationDateTime { get; set; }
         public bool IsAdult { get; set; }
-        public string UserId { get; set; }
+        public string UserEmail { get; set; }
         public string UID { get; set; }
         public string FileType { get; set; }
         public string FileName { get; set; }

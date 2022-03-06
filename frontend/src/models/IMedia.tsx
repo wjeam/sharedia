@@ -4,6 +4,8 @@ export interface IMedia {
   description: string;
   fileType: string;
   mediaType: number;
-  like: Record<string, number>;
-  dislike: Record<string, number>;
+  userEmail: string;
+  like: [];
+  dislike: [];
+  isAdult: boolean;
 }

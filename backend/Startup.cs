@@ -5,9 +5,9 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Identity.Web;
+using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using MongoDB.Driver;
-using MongoDB.Driver.GridFS;
 using sharedia.Services;
 
 namespace sharedia
@@ -31,13 +31,6 @@ namespace sharedia
                 return new MongoClient(connectionString);
             });
 
-            services.AddSingleton<IGridFSBucket>(sp =>
-            {
-                var client = sp.GetRequiredService<IMongoClient>();
-                var database = "sharedia";
-                return new GridFSBucket(client.GetDatabase("sharedia"));
-            });
-
             services.AddScoped(sp =>
             {
                 var client = sp.GetRequiredService<IMongoClient>();
@@ -58,9 +51,6 @@ namespace sharedia
                     }
                );
             });
-
-            services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
-                .AddMicrosoftIdentityWebApi(Configuration.GetSection("AzureAd"));
 
             services.AddControllers();
             services.AddSwaggerGen(c =>
