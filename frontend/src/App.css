@@ -5,4 +5,6 @@ body::-webkit-scrollbar {
 body {
   -ms-overflow-style: none; /* IE and Edge */
   scrollbar-width: none; /* Firefox */
+  background-color: "#DAE0E6";
+  height: "100%";
 }

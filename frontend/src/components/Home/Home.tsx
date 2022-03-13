@@ -3,20 +3,35 @@ import axios, { AxiosError, AxiosResponse } from "axios";
 import { Box } from "@mui/system";
 import MediaCard from "../MediaCard/MediaCard";
 import { IMedia } from "../../models/IMedia";
-import { Grid, Button, Badge } from "@mui/material";
+import {
+  Grid,
+  Button,
+  InputLabel,
+  FormControl,
+  MenuItem,
+  Badge,
+  Select,
+  SelectChangeEvent,
+} from "@mui/material";
+import PostDialog from "../PostDialog/PostDialog";
+import { FilterType } from "../../models/FilterType";
+import Navbar from "../Navbar/Navbar";
 
-const Home: FC<any> = ({ client, isAdult }) => {
+const Home: FC<any> = ({ client, isAdult, login, logout }) => {
   const [medias, setMedias] = useState([]);
+  const [postDialogOpen, setPostDialogOpen] = useState<boolean>(false);
+  const [postShown, setPostShown] = useState<IMedia | undefined>(undefined);
+  const [sort, setSort] = useState<string>("");
+  const [search, setSearch] = useState<string>("");
 
   useEffect(() => {
-    if (isAdult === undefined) return;
     fetchMedia();
   }, [isAdult]);
 
   const fetchMedia = () => {
     axios({
       method: "GET",
-      url: `https://localhost:4131/post/${isAdult ? "all-adult" : "all"}`,
+      url: `https://localhost:4131/post/${!!!isAdult ? "all" : "all-adult"}`,
     })
       .then((response: AxiosResponse) => {
         setMedias(response.data);
@@ -26,35 +41,94 @@ const Home: FC<any> = ({ client, isAdult }) => {
       });
   };
 
+  const toggleOpenPost = (value: boolean, media?: IMedia) => {
+    setPostDialogOpen(value);
+    setPostShown(media);
+  };
+
+  const handleFilterChange = (event: SelectChangeEvent) => {
+    setSort(event.target.value as string);
+  };
+
+  const sortBy = (filter: string, array: IMedia[]) => {
+    return array.sort((a: IMedia, b: IMedia) => {
+      if (filter === FilterType.LIKE) {
+        return Object.keys(b.like).length < Object.keys(a.like).length
+          ? -1
+          : Object.keys(b.like).length > Object.keys(a.like).length
+          ? 1
+          : 0;
+      }
+      if (filter === FilterType.DISLIKE) {
+        return Object.keys(b.dislike).length < Object.keys(a.dislike).length
+          ? -1
+          : Object.keys(b.dislike).length > Object.keys(a.dislike).length
+          ? 1
+          : 0;
+      }
+      return 0;
+    });
+  };
+
+  const filterBy = (filter: string, array: IMedia[]) => {
+    return array.filter((element: IMedia) => {
+      return (
+        element.title.toLocaleLowerCase().includes(filter) ||
+        element.description.toLocaleLowerCase().includes(filter)
+      );
+    });
+  };
+
+  const updateRating = (id: string, ratings: { likes: []; dislikes: [] }) => {
+    medias
+      .filter((media: IMedia) => media.id === id)
+      .map((media: IMedia) => {
+        media.like = ratings.likes;
+        media.dislike = ratings.dislikes;
+      });
+  };
+
   return (
-    <Box sx={{ backgroundColor: "#DAE0E6", pt: 5, height: "100%" }}>
-      <Grid container textAlign={"center"}>
-        {medias.map((media: IMedia) => {
-          return (
-            <Grid item xl={3} md={3} sm={3} xs={3} lg={3} alignSelf="center">
-              <Badge
-                badgeContent={"18+"}
-                color="error"
-                invisible={!media.isAdult}
-              >
-                <MediaCard
-                  id={media.id}
-                  title={media.title}
-                  description={media.description}
-                  mediaType={media.mediaType}
-                  fileType={media.fileType}
-                  like={media.like}
-                  dislike={media.dislike}
-                  isAdult={media.isAdult}
-                  userEmail={media.userEmail}
-                  currentUser={client.getActiveAccount()?.username}
-                />
-              </Badge>
-            </Grid>
-          );
-        })}
-      </Grid>
-    </Box>
+    <>
+      <Navbar
+        login={login}
+        logout={logout}
+        client={client}
+        isAdult={isAdult}
+        setSearch={setSearch}
+        search={search}
+        handleFilterChange={handleFilterChange}
+        sort={sort}
+      />
+      <Box sx={{ pt: 3 }}>
+        <Grid container textAlign={"center"}>
+          {sortBy(sort, filterBy(search, medias)).map((media: IMedia) => {
+            return (
+              <Grid item xl={3} md={6} sm={6} xs={12} lg={3} alignSelf="center">
+                <Badge
+                  key={media.id}
+                  badgeContent={"18+"}
+                  color="error"
+                  invisible={!media.isAdult}
+                >
+                  <MediaCard
+                    media={media}
+                    updateRating={updateRating}
+                    currentUser={client?.getActiveAccount()?.username}
+                    toggleOpenPost={toggleOpenPost}
+                  />
+                </Badge>
+              </Grid>
+            );
+          })}
+        </Grid>
+      </Box>
+      <PostDialog
+        open={postDialogOpen}
+        toggleOpen={toggleOpenPost}
+        media={postShown}
+      ></PostDialog>
+    </>
   );
 };
 

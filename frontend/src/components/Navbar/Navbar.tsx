@@ -6,13 +6,28 @@ import {
   Toolbar,
   Button,
   Tooltip,
+  TextField,
+  OutlinedInput,
+  InputLabel,
+  Select,
+  FormControl,
+  MenuItem,
 } from "@mui/material";
 import { Add, Menu, NoMeetingRoom, AccountCircle } from "@mui/icons-material";
 import React, { useState, FC, useEffect } from "react";
 import UploadDialog from "../UploadDialog/UploadDialog";
 import { AccountInfo, AuthenticationResult } from "@azure/msal-browser";
 
-const Navbar: FC<any> = ({ login, logout, client, isAdult }) => {
+const Navbar: FC<any> = ({
+  login,
+  logout,
+  client,
+  isAdult,
+  setSearch,
+  search,
+  handleFilterChange,
+  sort,
+}) => {
   const [uploadDialogOpen, setUploadDialogOpen] = useState(false);
   const [loggedUser, setLoggedUser] = useState<AccountInfo>();
 
@@ -30,6 +45,10 @@ const Navbar: FC<any> = ({ login, logout, client, isAdult }) => {
 
     registerRedirect();
   }, [client]);
+
+  const handleSearchChange = (event: any) => {
+    setSearch(event.target.value.toLocaleLowerCase());
+  };
 
   return (
     <>
@@ -56,12 +75,65 @@ const Navbar: FC<any> = ({ login, logout, client, isAdult }) => {
               open={uploadDialogOpen}
               toggleOpen={setUploadDialogOpen}
             />
+            <TextField
+              label="Search for keyword"
+              rows={1}
+              maxRows={1}
+              InputProps={{ sx: { height: 35, width: 350 } }}
+              InputLabelProps={{
+                sx: {
+                  ":not(&.Mui-focused)": {
+                    top: search.length > 0 ? 0 : -8,
+                  },
+                },
+              }}
+              onChange={handleSearchChange}
+              value={search}
+            />
+            <FormControl variant="outlined" sx={{ ml: 2, width: 150 }}>
+              <InputLabel
+                id="filter-label"
+                sx={{
+                  top: !!!sort ? -8 : 0,
+                  ":not(&.Mui-focused)": {
+                    top: !!!sort ? -8 : 0,
+                  },
+                  "&.Mui-focused": {
+                    top: 0,
+                  },
+                }}
+              >
+                Filter
+              </InputLabel>
+              <Select
+                labelId="filter-label"
+                id="filter"
+                label="Filter"
+                onChange={handleFilterChange}
+                SelectDisplayProps={{
+                  style: { paddingBottom: 6, paddingTop: 6 },
+                }}
+                value={sort}
+              >
+                <MenuItem value={"like"}>Likes</MenuItem>
+                <MenuItem value={"dislike"}>Dislikes</MenuItem>
+              </Select>
+            </FormControl>
             {!loggedUser ? (
-              <IconButton onClick={login} sx={{ ml: "auto" }}>
-                <Tooltip title="Login">
-                  <AccountCircle sx={{ fontSize: 25 }} />
-                </Tooltip>
-              </IconButton>
+              <>
+                <Typography
+                  fontFamily={"Roboto"}
+                  variant="subtitle2"
+                  sx={{ color: "rgba(0, 0, 0, 0.5)", ml: "auto" }}
+                >
+                  Welcome Guest!
+                </Typography>
+                <IconButton onClick={login}>
+                  <Tooltip title="Login">
+                    <AccountCircle sx={{ fontSize: 25 }} />
+                  </Tooltip>
+                </IconButton>
+              </>
             ) : (
               <>
                 <Typography

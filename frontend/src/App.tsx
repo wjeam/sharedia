@@ -23,19 +23,29 @@ const App = () => {
     },
   });
 
+  const loginRequest = {
+    scopes: [
+      "User.Read",
+      "profile",
+      "email",
+      "Presence.Read",
+      "offline_access",
+    ],
+  };
+
+  const accessTokenRequest = {
+    scopes: [
+      "User.Read",
+      "profile",
+      "email",
+      "Presence.Read",
+      "offline_access",
+    ],
+  };
+
   const [isAdult, setIsAdult] = useState<boolean | undefined>(undefined);
 
   const acquireToken = () => {
-    const accessTokenRequest = {
-      scopes: [
-        "User.Read",
-        "profile",
-        "email",
-        "Presence.Read",
-        "offline_access",
-      ],
-    };
-
     client
       .acquireTokenSilent(accessTokenRequest)
       .then((accessTokenResponse: any) => {
@@ -57,21 +67,12 @@ const App = () => {
   };
 
   useEffect(() => {
-    if (!!!client) return;
+    if (client.getAllAccounts().length === 0 || !!!client.getActiveAccount())
+      return;
     acquireToken();
   }, [client]);
 
   const login = async () => {
-    const loginRequest = {
-      scopes: [
-        "User.Read",
-        "profile",
-        "email",
-        "Presence.Read",
-        "offline_access",
-      ],
-    };
-
     client.loginRedirect(loginRequest);
   };
 
@@ -81,8 +82,7 @@ const App = () => {
 
   return (
     <div className="App">
-      <Navbar login={login} logout={logout} client={client} isAdult={isAdult} />
-      <Home client={client} isAdult={isAdult} />
+      <Home client={client} isAdult={isAdult} login={login} logout={logout} />
     </div>
   );
 };

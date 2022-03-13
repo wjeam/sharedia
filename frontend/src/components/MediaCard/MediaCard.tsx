@@ -18,24 +18,19 @@ import ShareIcon from "@mui/icons-material/Share";
 import axios, { AxiosError } from "axios";
 
 const MediaCard: FC<any> = ({
-  id,
-  title,
-  description,
-  fileType,
-  mediaType,
-  like,
-  dislike,
-  isAdult,
-  userEmail,
+  media,
   currentUser,
+  toggleOpenPost,
+  updateRating,
 }) => {
-  const [dislikes, setDislikes] = useState(dislike);
-  const [likes, setLikes] = useState(like);
+  const [dislikes, setDislikes] = useState(media.dislike);
+  const [likes, setLikes] = useState(media.like);
 
   const likePost = () => {
+    if (!!!currentUser) return;
     axios({
       method: "POST",
-      url: `https://localhost:4131/post/like?postId=${id}&userEmail=${currentUser}`,
+      url: `https://localhost:4131/post/like?postId=${media.id}&userEmail=${currentUser}`,
     })
       .then(() => {
         const postLiked = likes.hasOwnProperty(currentUser);
@@ -63,10 +58,16 @@ const MediaCard: FC<any> = ({
       });
   };
 
+  useEffect(() => {
+    updateRating(media.id, { likes: likes, dislikes: dislikes });
+  }, [likes, dislikes]);
+
   const dislikePost = () => {
+    if (!!!currentUser) return;
+
     axios({
       method: "POST",
-      url: `https://localhost:4131/post/dislike?postId=${id}&userEmail=${currentUser}`,
+      url: `https://localhost:4131/post/dislike?postId=${media.id}&userEmail=${currentUser}`,
     })
       .then(() => {
         const postLiked = likes.hasOwnProperty(currentUser);
@@ -103,39 +104,62 @@ const MediaCard: FC<any> = ({
         mb: 7,
       }}
     >
-      {mediaType == 1 ? (
+      {media.mediaType == 1 ? (
         <CardMedia
+          onClick={() => {
+            toggleOpenPost(true, media);
+          }}
           component={"img"}
           height="200"
-          src={`https://localhost:4131/post/media/${id}`}
+          src={`https://localhost:4131/post/media/${media.id}`}
           sx={{
             maxWidth: "100%",
             minWidth: "300px",
             height: "auto",
             maxHeight: "300px",
-            filter: isAdult ? "blur(0.3rem)" : "blur(0)",
+            filter: media.isAdult ? "blur(0.6rem)" : "blur(0)",
             ":hover": { filter: "blur(0)" },
+            cursor: "pointer",
           }}
         ></CardMedia>
       ) : (
         <Box
           sx={{
-            filter: isAdult ? "blur(0.3rem)" : "blur(0)",
+            filter: media.isAdult ? "blur(0.6rem)" : "blur(0)",
             ":hover": { filter: "blur(0)" },
           }}
         >
           <video width="100%" height="auto" controls>
             <source
-              src={`https://localhost:4131/post/media/${id}`}
-              type={`video/${fileType}`}
+              style={{ cursor: "pointer" }}
+              src={`https://localhost:4131/post/media/${media.id}`}
+              type={`video/${media.fileType}`}
             />
           </video>
         </Box>
       )}
       <CardContent sx={{ py: 1 }}>
-        <Typography variant="h5">{title}</Typography>
-        <Typography variant="body2" sx={{ display: "inline" }}>
-          {description}
+        <Typography
+          variant="subtitle2"
+          sx={{
+            whiteSpace: "initial",
+            fontSize: "1.2em",
+            fontWeight: "400",
+            wordWrap: "break-word",
+          }}
+        >
+          {media.title}
+        </Typography>
+        <Typography
+          variant="body2"
+          sx={{
+            display: "inline",
+            whiteSpace: "initial",
+            wordWrap: "break-word",
+            color: "rgba(0, 0, 0, 0.7)",
+          }}
+        >
+          {media.description}
         </Typography>
       </CardContent>
       <CardActions
@@ -177,7 +201,7 @@ const MediaCard: FC<any> = ({
               }}
               onClick={() => {
                 navigator.clipboard.writeText(
-                  "https://localhost:4131/post/media/" + id
+                  "https://localhost:4131/post/media/" + media.id
                 );
               }}
             >
@@ -185,7 +209,7 @@ const MediaCard: FC<any> = ({
             </IconButton>
           </Tooltip>
           <Typography variant="caption" sx={{ display: "block" }}>
-            Uploaded by {userEmail}
+            Uploaded by {media.userEmail}
           </Typography>
         </Container>
       </CardActions>
