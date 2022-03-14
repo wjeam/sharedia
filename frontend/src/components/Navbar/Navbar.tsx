@@ -35,12 +35,10 @@ const Navbar: FC<any> = ({
     if (client == null) return;
 
     const registerRedirect = async () => {
-      await client
-        .handleRedirectPromise()
-        .then((response: AuthenticationResult | null) => {
-          setLoggedUser(client.getAllAccounts()[0]);
-          client.setActiveAccount(client.getAllAccounts()[0]);
-        });
+      await client.handleRedirectPromise().then(() => {
+        setLoggedUser(client.getAllAccounts()[0]);
+        client.setActiveAccount(client.getAllAccounts()[0]);
+      });
     };
 
     registerRedirect();
@@ -83,7 +81,7 @@ const Navbar: FC<any> = ({
               InputLabelProps={{
                 sx: {
                   ":not(&.Mui-focused)": {
-                    top: search.length > 0 ? 0 : -8,
+                    top: search.length > 0 ? 0 : -9,
                   },
                 },
               }}
@@ -94,9 +92,9 @@ const Navbar: FC<any> = ({
               <InputLabel
                 id="filter-label"
                 sx={{
-                  top: !!!sort ? -8 : 0,
+                  top: !!!sort ? -9 : 0,
                   ":not(&.Mui-focused)": {
-                    top: !!!sort ? -8 : 0,
+                    top: !!!sort ? -9 : 0,
                   },
                   "&.Mui-focused": {
                     top: 0,
@@ -109,14 +107,37 @@ const Navbar: FC<any> = ({
                 labelId="filter-label"
                 id="filter"
                 label="Filter"
-                onChange={handleFilterChange}
                 SelectDisplayProps={{
                   style: { paddingBottom: 6, paddingTop: 6 },
                 }}
                 value={sort}
               >
-                <MenuItem value={"like"}>Likes</MenuItem>
-                <MenuItem value={"dislike"}>Dislikes</MenuItem>
+                <MenuItem
+                  onClick={() => {
+                    handleFilterChange("like");
+                  }}
+                  value={"like"}
+                >
+                  Likes
+                </MenuItem>
+                <MenuItem
+                  onClick={() => {
+                    handleFilterChange("dislike");
+                  }}
+                  value={"dislike"}
+                >
+                  Dislikes
+                </MenuItem>
+                {isAdult ? (
+                  <MenuItem
+                    onClick={() => {
+                      handleFilterChange("adult");
+                    }}
+                    value={"adult"}
+                  >
+                    Adult 18+
+                  </MenuItem>
+                ) : null}
               </Select>
             </FormControl>
             {!loggedUser ? (

@@ -106,7 +106,7 @@ namespace sharedia.Controllers
         public async Task<FileResult> GetMediaAsync(string id)
         {
             var post = await _postService.GetPostAsync(id);
-            var stream = new FileStream(StoragePath + "/" + post.UID + "." + post.FileType, FileMode.Open, FileAccess.ReadWrite, FileShare.None, 4096, FileOptions.Asynchronous);
+            var stream = new FileStream($"{StoragePath}/{post.UID}.{post.FileType}", FileMode.Open, FileAccess.Read, FileShare.Read, 4096, FileOptions.Asynchronous);
             var fileStreamResult = new FileStreamResult(stream, post.MediaType.ToString().ToLower() + "/" + post.FileType);
             fileStreamResult.EnableRangeProcessing = true;
 

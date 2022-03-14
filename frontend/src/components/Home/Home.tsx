@@ -3,19 +3,11 @@ import axios, { AxiosError, AxiosResponse } from "axios";
 import { Box } from "@mui/system";
 import MediaCard from "../MediaCard/MediaCard";
 import { IMedia } from "../../models/IMedia";
-import {
-  Grid,
-  Button,
-  InputLabel,
-  FormControl,
-  MenuItem,
-  Badge,
-  Select,
-  SelectChangeEvent,
-} from "@mui/material";
+import { Grid, Badge, SelectChangeEvent } from "@mui/material";
 import PostDialog from "../PostDialog/PostDialog";
 import { FilterType } from "../../models/FilterType";
 import Navbar from "../Navbar/Navbar";
+import { motion } from "framer-motion";
 
 const Home: FC<any> = ({ client, isAdult, login, logout }) => {
   const [medias, setMedias] = useState([]);
@@ -46,20 +38,20 @@ const Home: FC<any> = ({ client, isAdult, login, logout }) => {
     setPostShown(media);
   };
 
-  const handleFilterChange = (event: SelectChangeEvent) => {
-    setSort(event.target.value as string);
+  const handleFilterChange = (value: string) => {
+    setSort(value);
   };
 
   const sortBy = (filter: string, array: IMedia[]) => {
-    return array.sort((a: IMedia, b: IMedia) => {
-      if (filter === FilterType.LIKE) {
+    return filterBy(search, array).sort((a: IMedia, b: IMedia) => {
+      if ((filter as FilterType) === FilterType.LIKE) {
         return Object.keys(b.like).length < Object.keys(a.like).length
           ? -1
           : Object.keys(b.like).length > Object.keys(a.like).length
           ? 1
           : 0;
       }
-      if (filter === FilterType.DISLIKE) {
+      if ((filter as FilterType) === FilterType.DISLIKE) {
         return Object.keys(b.dislike).length < Object.keys(a.dislike).length
           ? -1
           : Object.keys(b.dislike).length > Object.keys(a.dislike).length
@@ -73,8 +65,9 @@ const Home: FC<any> = ({ client, isAdult, login, logout }) => {
   const filterBy = (filter: string, array: IMedia[]) => {
     return array.filter((element: IMedia) => {
       return (
-        element.title.toLocaleLowerCase().includes(filter) ||
-        element.description.toLocaleLowerCase().includes(filter)
+        (element.title.toLocaleLowerCase().includes(filter) ||
+          element.description.toLocaleLowerCase().includes(filter)) &&
+        ((sort as FilterType) === FilterType.ADULT ? element.isAdult : true)
       );
     });
   };
@@ -102,7 +95,7 @@ const Home: FC<any> = ({ client, isAdult, login, logout }) => {
       />
       <Box sx={{ pt: 3 }}>
         <Grid container textAlign={"center"}>
-          {sortBy(sort, filterBy(search, medias)).map((media: IMedia) => {
+          {sortBy(sort, medias).map((media: IMedia) => {
             return (
               <Grid item xl={3} md={6} sm={6} xs={12} lg={3} alignSelf="center">
                 <Badge
