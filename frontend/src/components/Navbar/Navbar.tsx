@@ -56,17 +56,19 @@ const Navbar: FC<any> = ({
             <IconButton edge="start">
               <Menu />
             </IconButton>
-            <IconButton
-              onClick={() =>
-                uploadDialogOpen
-                  ? setUploadDialogOpen(false)
-                  : setUploadDialogOpen(true)
-              }
-            >
-              <Tooltip title="Create a post">
-                <Add sx={{ fontSize: 25 }} />
-              </Tooltip>
-            </IconButton>
+            {loggedUser && (
+              <IconButton
+                onClick={() =>
+                  uploadDialogOpen
+                    ? setUploadDialogOpen(false)
+                    : setUploadDialogOpen(true)
+                }
+              >
+                <Tooltip title="Create a post">
+                  <Add sx={{ fontSize: 25 }} />
+                </Tooltip>
+              </IconButton>
+            )}
             <UploadDialog
               isAdult={isAdult}
               loggedUser={loggedUser}

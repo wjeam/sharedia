@@ -52,13 +52,13 @@ namespace sharedia.Services
             var cursor = await _posts.FindAsync(f => f.Id == postId);
             var post = await cursor.FirstAsync();
 
-            post.Like.TryRemove(userEmail, out _);
+            post.Like.Remove(userEmail);
             var added = post.Dislike.TryAdd(userEmail, 1);
 
             if(!added)
-                post.Dislike.TryRemove(userEmail, out _);
+                post.Dislike.Remove(userEmail);
 
-            await _posts.UpdateOneAsync(f => f.Id == postId, Builders<Post>.Update
+            await _posts.UpdateOneAsync(document => document.Id == postId, Builders<Post>.Update
                 .Set(p => p.Like, post.Like)
                 .Set(p => p.Dislike, post.Dislike));
         }
@@ -68,21 +68,21 @@ namespace sharedia.Services
             var cursor = await _posts.FindAsync(f => f.Id == postId);
             var post = await cursor.FirstAsync();
 
-            post.Dislike.TryRemove(userEmail, out _);
+            post.Dislike.Remove(userEmail);
             var added = post.Like.TryAdd(userEmail, 1);
 
             if(!added)
-                post.Like.TryRemove(userEmail, out _);
+                post.Like.Remove(userEmail);
 
-            await _posts.UpdateOneAsync(f => f.Id == postId, Builders<Post>.Update
+            await _posts.UpdateOneAsync(document => document.Id == postId, Builders<Post>.Update
                 .Set(p => p.Like, post.Like)
                 .Set(p => p.Dislike, post.Dislike));
         }
 
         public async Task<IEnumerable<Post>> GetPostsByUserEmailAsync(string email)
         {
-            var posts = await _posts.FindAsync(documents => documents.UserEmail.Equals(email));
-            return posts.ToEnumerable();
+            var cursor = await _posts.FindAsync(document => document.UserEmail.Equals(email));
+            return cursor.ToEnumerable();
         }
     }
 }

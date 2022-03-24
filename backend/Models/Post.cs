@@ -2,7 +2,7 @@
 using MongoDB.Bson.Serialization.Attributes;
 using Newtonsoft.Json;
 using System;
-using System.Collections.Concurrent;
+using System.Collections.Generic;
 
 namespace sharedia.Models
 {
@@ -16,9 +16,9 @@ namespace sharedia.Models
         [BsonElement("description")]
         public string Description { get; set; }
         [BsonElement("like")]
-        public ConcurrentDictionary<string, byte> Like { get; set; } = new();
+        public Dictionary<string, byte> Like { get; set; } = new();
         [BsonElement("dislike")]
-        public ConcurrentDictionary<string, byte> Dislike { get; set; } = new();
+        public Dictionary<string, byte> Dislike { get; set; } = new();
         [BsonElement("creationDateTime")]
         public DateTime CreationDateTime { get; set; } =  DateTime.Now;
         [BsonElement("isAdult")]

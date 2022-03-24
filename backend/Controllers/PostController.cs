@@ -5,8 +5,8 @@ using sharedia.Models;
 using sharedia.Services;
 using System;
 using System.IO;
-using System.Text;
 using System.Threading.Tasks;
+using sharedia.Mapper;
 
 namespace sharedia.Controllers
 {
@@ -32,7 +32,7 @@ namespace sharedia.Controllers
                 UserEmail = form["userEmail"],
                 FileName = form["fileName"],
                 FileType = form["fileType"],
-                MediaType = (MediaType)Enum.Parse(typeof(MediaType), form["mediaType"]),
+                MediaType = (MediaType) Enum.Parse(typeof(MediaType), form["mediaType"]),
                 UID = UID,
             };
 
@@ -54,38 +54,42 @@ namespace sharedia.Controllers
             return Ok();
         }
 
-        // REFACTOR
         [HttpPost("create")]
         public async Task<IActionResult> CreatePostAsync()
         {
-            var file = Request.Form.Files[0];
-            var form = Request.Form;
+            var file = Request?.Form.Files[0];
 
+            if (file == null)
+            {
+                return Problem("An error as occured processing your request, please try again later.");
+            }
+
+            var form = Request.Form;
             var UID = Guid.NewGuid().ToString();
-            var newFilePath = new StringBuilder();
+            var newFilePath = $"{StoragePath}/{UID}.{form["fileType"]}";
 
             var postDto = await CreatePostAsync(form, UID);
 
-            newFilePath.Append(StoragePath);
-            newFilePath.Append("/");
-            newFilePath.Append(UID);
-            newFilePath.Append(".");
-            newFilePath.Append(form["fileType"]);
-
-            using (var stream = System.IO.File.Create(newFilePath.ToString()))
+            try
             {
-                await file.CopyToAsync(stream);
-            }
+                await using (var stream = System.IO.File.Create(newFilePath))
+                {
+                    await file.CopyToAsync(stream);
+                }
 
-            // REMOVE HARDCODED
-            return Created("https://localhost:4131/post/media/" + postDto.Id, null);
+                return Created("https://localhost:4131/post/media/" + postDto.Id, null);
+            }
+            catch (Exception)
+            {
+                return Problem("An error as occured, please try again later.");
+            }
         }
 
         [HttpGet("user/{id}")]
         public async Task<IActionResult> GetPostsByUserIdAsync(string email)
         {
             var posts = await _postService.GetPostsByUserEmailAsync(email);
-            return Ok(posts);
+            return Ok(PostMapper.ToDto(posts));
         }
 
         [HttpDelete("delete/{id}")]
@@ -99,7 +103,8 @@ namespace sharedia.Controllers
         public async Task<IActionResult> GetAdultPostsAsync()
         {
             var posts = await _postService.GetAdultPostsAsync();
-            return Ok(posts);
+            var result = PostMapper.ToDto(posts);
+            return Ok(result);
         }
 
         [HttpGet("media/{id}")]
@@ -107,8 +112,10 @@ namespace sharedia.Controllers
         {
             var post = await _postService.GetPostAsync(id);
             var stream = new FileStream($"{StoragePath}/{post.UID}.{post.FileType}", FileMode.Open, FileAccess.Read, FileShare.Read, 4096, FileOptions.Asynchronous);
-            var fileStreamResult = new FileStreamResult(stream, post.MediaType.ToString().ToLower() + "/" + post.FileType);
-            fileStreamResult.EnableRangeProcessing = true;
+            var fileStreamResult = new FileStreamResult(stream, $"{post.MediaType.ToString().ToLower()}/{post.FileType}")
+            {
+                EnableRangeProcessing = true
+            };
 
             return fileStreamResult;
         }
@@ -117,7 +124,8 @@ namespace sharedia.Controllers
         public async Task<IActionResult> GetPostsAsync()
         {
             var posts = await _postService.GetPostsAsync();
-            return Ok(posts);
+            var result = PostMapper.ToDto(posts);
+            return Ok(result);
         }
 
         [HttpGet("{id}")]
@@ -125,7 +133,7 @@ namespace sharedia.Controllers
         {
             var post = await _postService.GetPostAsync(id);
 
-            if (post == null)
+            if (post is null)
                 return NotFound();
 
             return Ok(post);
