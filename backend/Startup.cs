@@ -36,6 +36,7 @@ namespace sharedia
                 return client.GetDatabase(database);
             });
 
+            services.AddScoped<ThreadService>();
             services.AddScoped<PostService>();
 
             services.AddCors(options =>

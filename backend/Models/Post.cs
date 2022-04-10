@@ -16,9 +16,9 @@ namespace sharedia.Models
         [BsonElement("description")]
         public string Description { get; set; }
         [BsonElement("like")]
-        public Dictionary<string, byte> Like { get; set; } = new();
+        public HashSet<string> Like { get; set; } = new();
         [BsonElement("dislike")]
-        public Dictionary<string, byte> Dislike { get; set; } = new();
+        public HashSet<string> Dislike { get; set; } = new();
         [BsonElement("creationDateTime")]
         public DateTime CreationDateTime { get; set; } =  DateTime.Now;
         [BsonElement("isAdult")]

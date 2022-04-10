@@ -15,6 +15,7 @@ import {
 import FavoriteIcon from "@mui/icons-material/Favorite";
 import HeartBrokenIcon from "@mui/icons-material/HeartBroken";
 import ShareIcon from "@mui/icons-material/Share";
+import ReplyIcon from "@mui/icons-material/Reply";
 import axios, { AxiosError } from "axios";
 
 const MediaCard: FC<any> = ({
@@ -33,23 +34,22 @@ const MediaCard: FC<any> = ({
       url: `https://localhost:4131/post/like?postId=${media.id}&userEmail=${currentUser}`,
     })
       .then(() => {
-        const postLiked = likes.hasOwnProperty(currentUser);
-        const postDisliked = dislikes.hasOwnProperty(currentUser);
+        console.log(likes);
+
+        const postLiked = likes.includes(currentUser);
+        const postDisliked = dislikes.includes(currentUser);
 
         if (!postLiked) {
-          setLikes((likes: any) => ({
-            ...likes,
-            [currentUser]: 1,
-          }));
+          setLikes((likes: any) => [...likes, currentUser]);
         } else {
           setLikes((likes: any) =>
-            Object.keys(likes).filter((email) => email != currentUser)
+            likes.filter((email: string) => email != currentUser)
           );
         }
 
         if (postDisliked) {
           setDislikes((dislikes: any) =>
-            Object.keys(dislikes).filter((email) => email != currentUser)
+            dislikes.filter((email: string) => email != currentUser)
           );
         }
       })
@@ -63,6 +63,7 @@ const MediaCard: FC<any> = ({
   }, [likes, dislikes]);
 
   const dislikePost = () => {
+    console.log(dislikes);
     if (!!!currentUser) return;
 
     axios({
@@ -70,23 +71,20 @@ const MediaCard: FC<any> = ({
       url: `https://localhost:4131/post/dislike?postId=${media.id}&userEmail=${currentUser}`,
     })
       .then(() => {
-        const postLiked = likes.hasOwnProperty(currentUser);
-        const postDisliked = dislikes.hasOwnProperty(currentUser);
+        const postLiked = likes.includes(currentUser);
+        const postDisliked = dislikes.includes(currentUser);
 
         if (!postDisliked) {
-          setDislikes((dislikes: any) => ({
-            ...dislikes,
-            [currentUser]: 1,
-          }));
+          setDislikes((dislikes: any) => [...dislikes, currentUser]);
         } else {
           setDislikes((dislikes: any) =>
-            Object.keys(dislikes).filter((email) => email != currentUser)
+            dislikes.filter((email: string) => email != currentUser)
           );
         }
 
         if (postLiked) {
           setLikes((likes: any) =>
-            Object.keys(likes).filter((email) => email != currentUser)
+            likes.filter((email: string) => email != currentUser)
           );
         }
       })
@@ -192,6 +190,16 @@ const MediaCard: FC<any> = ({
               <Badge badgeContent={Object.keys(dislikes).length}>
                 <HeartBrokenIcon />
               </Badge>
+            </IconButton>
+          </Tooltip>
+          <Tooltip title="Comment">
+            <IconButton
+              sx={{
+                ":hover": { color: "pink" },
+                color: "rgba(0, 0, 0, 0.5)",
+              }}
+            >
+              <ReplyIcon />
             </IconButton>
           </Tooltip>
           <Tooltip title="Copy to clipboard">

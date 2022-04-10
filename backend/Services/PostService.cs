@@ -53,7 +53,7 @@ namespace sharedia.Services
             var post = await cursor.FirstAsync();
 
             post.Like.Remove(userEmail);
-            var added = post.Dislike.TryAdd(userEmail, 1);
+            var added = post.Dislike.Add(userEmail);
 
             if(!added)
                 post.Dislike.Remove(userEmail);
@@ -69,7 +69,7 @@ namespace sharedia.Services
             var post = await cursor.FirstAsync();
 
             post.Dislike.Remove(userEmail);
-            var added = post.Like.TryAdd(userEmail, 1);
+            var added = post.Like.Add(userEmail);
 
             if(!added)
                 post.Like.Remove(userEmail);

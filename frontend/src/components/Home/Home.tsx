@@ -27,6 +27,7 @@ const Home: FC<any> = ({ client, isAdult, login, logout }) => {
     })
       .then((response: AxiosResponse) => {
         setMedias(response.data);
+        console.log(response.data);
       })
       .catch((error: AxiosError) => {
         console.error(error);

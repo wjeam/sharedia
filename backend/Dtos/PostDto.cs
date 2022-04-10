@@ -11,8 +11,8 @@ namespace sharedia.Dtos
         public string Id { get; set; }
         public string Title { get; set; }
         public string Description { get; set; }
-        public Dictionary<string, byte> Like { get; set; }
-        public Dictionary<string, byte> Dislike { get; set; }
+        public HashSet<string> Like { get; set; }
+        public HashSet<string> Dislike { get; set; }
         public DateTime CreationDateTime { get; set; }
         public bool IsAdult { get; set; }
         public string UserEmail { get; set; }

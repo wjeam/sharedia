@@ -65,6 +65,7 @@ namespace sharedia.Controllers
             }
 
             var form = Request.Form;
+
             var UID = Guid.NewGuid().ToString();
             var newFilePath = $"{StoragePath}/{UID}.{form["fileType"]}";
 
