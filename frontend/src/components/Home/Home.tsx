@@ -7,6 +7,7 @@ import { Grid, Badge, SelectChangeEvent } from "@mui/material";
 import PostDialog from "../PostDialog/PostDialog";
 import { FilterType } from "../../models/FilterType";
 import Navbar from "../Navbar/Navbar";
+import Thread from "../Thread/Thread";
 import { motion } from "framer-motion";
 
 const Home: FC<any> = ({ client, isAdult, login, logout }) => {
@@ -27,7 +28,6 @@ const Home: FC<any> = ({ client, isAdult, login, logout }) => {
     })
       .then((response: AxiosResponse) => {
         setMedias(response.data);
-        console.log(response.data);
       })
       .catch((error: AxiosError) => {
         console.error(error);
@@ -117,11 +117,13 @@ const Home: FC<any> = ({ client, isAdult, login, logout }) => {
           })}
         </Grid>
       </Box>
-      <PostDialog
-        open={postDialogOpen}
-        toggleOpen={toggleOpenPost}
-        media={postShown}
-      ></PostDialog>
+      {postDialogOpen && (
+        <PostDialog
+          open={postDialogOpen}
+          toggleOpen={toggleOpenPost}
+          media={postShown}
+        ></PostDialog>
+      )}
     </>
   );
 };

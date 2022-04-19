@@ -16,7 +16,7 @@ import FavoriteIcon from "@mui/icons-material/Favorite";
 import HeartBrokenIcon from "@mui/icons-material/HeartBroken";
 import ShareIcon from "@mui/icons-material/Share";
 import ReplyIcon from "@mui/icons-material/Reply";
-import axios, { AxiosError } from "axios";
+import axios, { AxiosError, AxiosResponse } from "axios";
 
 const MediaCard: FC<any> = ({
   media,
