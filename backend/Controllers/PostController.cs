@@ -100,10 +100,10 @@ namespace sharedia.Controllers
             return Accepted();
         }
 
-        [HttpGet("all-adult")]
-        public async Task<IActionResult> GetAdultPostsAsync()
+        [HttpGet("minor")]
+        public async Task<IActionResult> GetMinorPostsAsync()
         {
-            var posts = await _postService.GetAdultPostsAsync();
+            var posts = await _postService.GetMinorPostsAsync();
             var result = PostMapper.ToDto(posts);
             return Ok(result);
         }

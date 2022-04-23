@@ -6,11 +6,8 @@ using System.Collections.Generic;
 
 namespace sharedia.Models
 {
-    public class Post
+    public class Post : BaseModel
     {
-        [BsonId]
-        [BsonRepresentation(BsonType.ObjectId)]
-        public string Id { get; set; }
         [BsonElement("title")]
         public string Title { get; set; }
         [BsonElement("description")]
