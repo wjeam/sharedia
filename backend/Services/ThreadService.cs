@@ -1,31 +1,44 @@
-using MongoDB.Driver;
+using System;
 using sharedia.Models;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
+using sharedia.Repositories;
 
 namespace sharedia.Services
 {
-    public class ThreadService
+    public class ThreadService : IThreadService
     {
-        private readonly IMongoCollection<Thread> _threads;
+        private readonly IThreadRepository _threadRepository;
 
-        public ThreadService(IMongoDatabase database)
+        public ThreadService(IThreadRepository threadRepository)
         {
-            _threads = database.GetCollection<Thread>("threads");
+            _threadRepository = threadRepository;
         }
 
         public async Task<List<Thread>> GetAllThreadByParentIdAsync(string parentId)
         {
-            var cursor = await _threads.FindAsync(thread => thread.ParentId == parentId);
-            var threads = cursor.ToList();
+            try
+            {
+                var threads = await _threadRepository.GetAllByParentId(parentId);
+                return threads.ToList();
+            }
+            catch (Exception)
+            {
+            }
 
-            return threads;
+            return null;
         }
 
-        public async Task<Thread> CreateThreadAsync(Thread thread)
+        public async Task CreateThreadAsync(Thread thread)
         {
-            await _threads.InsertOneAsync(thread);
-            return thread;
+            try
+            {
+                await _threadRepository.CreateAsync(thread);
+            }
+            catch (Exception)
+            {
+            }
         }
     }
 }

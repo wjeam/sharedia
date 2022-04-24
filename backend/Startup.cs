@@ -6,6 +6,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.OpenApi.Models;
 using MongoDB.Driver;
+using sharedia.Repositories;
 using sharedia.Services;
 
 namespace sharedia
@@ -36,8 +37,10 @@ namespace sharedia
                 return client.GetDatabase(database);
             });
 
-            services.AddScoped<ThreadService>();
-            services.AddScoped<PostService>();
+            services.AddScoped<IThreadRepository, ThreadRepository>();
+            services.AddScoped<IPostRepository, PostRepository>();
+            services.AddScoped<IThreadService, ThreadService>();
+            services.AddScoped<IPostService, PostService>();
 
             services.AddCors(options =>
             {

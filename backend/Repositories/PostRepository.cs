@@ -25,14 +25,14 @@ namespace sharedia.Repositories
             return cursor.ToEnumerable();
         }
 
-        public async Task UpdatePostLikes(Post post, string userEmail)
+        public async Task UpdateLikesAsync(Post post, string userEmail)
         {
             await Collection.UpdateOneAsync(document => document.Id == post.Id, Builders<Post>.Update
                 .Set(p => p.Like, post.Like)
                 .Set(p => p.Dislike, post.Dislike));
         }
 
-        public async Task UpdatePostDislikes(Post post, string userEmail)
+        public async Task UpdateDislikesAsync(Post post, string userEmail)
         {
             await Collection.UpdateOneAsync(document => document.Id == post.Id, Builders<Post>.Update
                 .Set(p => p.Like, post.Like)

@@ -10,8 +10,8 @@ namespace sharedia.Repositories
 
         Task<IEnumerable<Post>> GetMinorPostsAsync();
 
-        Task UpdatePostLikes(Post post, string userEmail);
+        Task UpdateLikesAsync(Post post, string userEmail);
 
-        Task UpdatePostDislikes(Post post, string userEmail);
+        Task UpdateDislikesAsync(Post post, string userEmail);
     }
 }

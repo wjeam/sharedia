@@ -6,23 +6,25 @@ using sharedia.Services;
 using System;
 using System.IO;
 using System.Threading.Tasks;
+using sharedia.Attributes;
 using sharedia.Mapper;
 
 namespace sharedia.Controllers
 {
     [ApiController]
     [Route("post")]
+    [ApiKeyAuthorization]
     public class PostController : ControllerBase
     {
-        private readonly PostService _postService;
+        private readonly IPostService _postService;
         private const string StoragePath = @"C:\sharedia";
 
-        public PostController(PostService postService)
+        public PostController(IPostService postService)
         {
             _postService = postService;
         }
 
-        private async Task<PostDto> CreatePostAsync(IFormCollection form, string UID)
+        private async Task<IActionResult> CreatePostAsync(IFormCollection form, string UID)
         {
             var postDto = new PostDto
             {
@@ -37,7 +39,8 @@ namespace sharedia.Controllers
             };
 
             await _postService.CreatePostAsync(postDto);
-            return postDto;
+
+            return Ok(postDto);
         }
 
         [HttpPost("like")]
@@ -69,7 +72,7 @@ namespace sharedia.Controllers
             var UID = Guid.NewGuid().ToString();
             var newFilePath = $"{StoragePath}/{UID}.{form["fileType"]}";
 
-            var postDto = await CreatePostAsync(form, UID);
+            var postDto = await _postService.CreatePostAsync(form, UID);
 
             try
             {
@@ -78,7 +81,7 @@ namespace sharedia.Controllers
                     await file.CopyToAsync(stream);
                 }
 
-                return Created("https://localhost:4131/post/media/" + postDto.Id, null);
+                return Created("https://localhost:4131/post/media/" + postDto., null);
             }
             catch (Exception)
             {

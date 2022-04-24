@@ -104,7 +104,7 @@ namespace sharedia.Services
                         post.Dislike.Remove(userEmail);
                     }
 
-                    await _postRepository.UpdatePostDislikes(post, userEmail);
+                    await _postRepository.UpdateDislikesAsync(post, userEmail);
                 }
             }
             catch (Exception)
@@ -128,7 +128,7 @@ namespace sharedia.Services
                         post.Like.Remove(userEmail);
                     }
 
-                    await _postRepository.UpdatePostLikes(post, userEmail);
+                    await _postRepository.UpdateLikesAsync(post, userEmail);
                 }
             }
             catch (Exception e)
