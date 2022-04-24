@@ -13,9 +13,10 @@ import FavoriteIcon from "@mui/icons-material/Favorite";
 import HeartBrokenIcon from "@mui/icons-material/HeartBroken";
 import axios, { AxiosResponse } from "axios";
 import Comment from "../Comment/Comment";
+import IThread from "../../models/IThread";
 
-const Thread: FC<any> = ({ thread }) => {
-  const [subthreads, setSubThreads] = useState([]);
+const Thread: FC<any> = ({ thread, userEmail }) => {
+  const [subthreads, setSubThreads] = useState<any[]>([]);
   const [showComment, setShowComment] = useState(false);
   const [showReplies, setShowReplies] = useState(false);
   const [repliesFetched, setRepliesFetched] = useState(false);
@@ -24,10 +25,17 @@ const Thread: FC<any> = ({ thread }) => {
     axios({
       method: "GET",
       url: `https://localhost:4131/thread/${thread.id}`,
+      headers: {
+        ApiKey: "12345",
+      },
       responseType: "json",
     }).then((response: AxiosResponse) => {
       setSubThreads(response.data);
     });
+  };
+
+  const addThread = (thread: any) => {
+    setSubThreads((subthreads: any[]) => [...subthreads, thread]);
   };
 
   useEffect(() => {
@@ -110,10 +118,17 @@ const Thread: FC<any> = ({ thread }) => {
         </Box>
       </Grid>
       <Grid item px={2}>
-        {showComment && <Comment></Comment>}
+        {showComment && (
+          <Comment
+            closeComment={setShowComment}
+            parentId={thread.id}
+            userEmail={userEmail}
+            addThread={addThread}
+          ></Comment>
+        )}
         {showReplies &&
           subthreads.map((subthread) => {
-            return <Thread thread={subthread}></Thread>;
+            return <Thread userEmail={userEmail} thread={subthread}></Thread>;
           })}
       </Grid>
     </Grid>

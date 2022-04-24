@@ -1,4 +1,4 @@
-import React, { FC, useEffect, useState } from "react";
+import React, { FC, useEffect, useRef, useState } from "react";
 import {
   Card,
   CardContent,
@@ -17,6 +17,7 @@ import HeartBrokenIcon from "@mui/icons-material/HeartBroken";
 import ShareIcon from "@mui/icons-material/Share";
 import ReplyIcon from "@mui/icons-material/Reply";
 import axios, { AxiosError, AxiosResponse } from "axios";
+import { MediaType } from "../../models/MediaType";
 
 const MediaCard: FC<any> = ({
   media,
@@ -26,11 +27,55 @@ const MediaCard: FC<any> = ({
 }) => {
   const [dislikes, setDislikes] = useState(media.dislike);
   const [likes, setLikes] = useState(media.like);
+  const [url, setUrl] = useState<string>("");
+  const videoRef = useRef<HTMLVideoElement>(null);
+
+  useEffect(() => {
+    fetchFile();
+  }, []);
+
+  useEffect(() => {
+    if (media.mediaType == 0) {
+      videoRef.current?.load();
+    }
+  }, [url]);
+
+  const fetchFile = () => {
+    axios({
+      method: "GET",
+      headers: {
+        ApiKey: "12345",
+      },
+      responseType: "arraybuffer",
+      url: `https://localhost:4131/post/media/${media.id}`,
+    })
+      .then((response: AxiosResponse) => {
+        switch (media.mediaType) {
+          case MediaType.Image:
+            let type = response.headers["Content-Type"];
+            let imageBlob = new Blob([response.data], { type: type });
+
+            setUrl(URL.createObjectURL(imageBlob));
+            break;
+          case MediaType.Video:
+            let video = new File([response.data], media.fileName);
+            setUrl(URL.createObjectURL(video));
+            break;
+        }
+      })
+      .catch((error: AxiosError) => {
+        console.error(error);
+      });
+  };
 
   const likePost = () => {
     if (!!!currentUser) return;
+
     axios({
       method: "POST",
+      headers: {
+        ApiKey: "12345",
+      },
       url: `https://localhost:4131/post/like?postId=${media.id}&userEmail=${currentUser}`,
     })
       .then(() => {
@@ -68,6 +113,9 @@ const MediaCard: FC<any> = ({
 
     axios({
       method: "POST",
+      headers: {
+        ApiKey: "12345",
+      },
       url: `https://localhost:4131/post/dislike?postId=${media.id}&userEmail=${currentUser}`,
     })
       .then(() => {
@@ -102,14 +150,14 @@ const MediaCard: FC<any> = ({
         mb: 7,
       }}
     >
-      {media.mediaType == 1 ? (
+      {media.mediaType == MediaType.Image ? (
         <CardMedia
           onClick={() => {
             toggleOpenPost(true, media);
           }}
           component={"img"}
           height="200"
-          src={`https://localhost:4131/post/media/${media.id}`}
+          src={url}
           sx={{
             maxWidth: "100%",
             minWidth: "300px",
@@ -127,10 +175,22 @@ const MediaCard: FC<any> = ({
             ":hover": { filter: "blur(0)" },
           }}
         >
-          <video width="100%" height="auto" controls>
+          <video
+            width="100%"
+            height="auto"
+            controls
+            ref={videoRef}
+            onClick={() => {
+              toggleOpenPost(true, media);
+              videoRef?.current?.paused
+                ? videoRef?.current?.play()
+                : videoRef?.current?.pause();
+            }}
+          >
             <source
+              id={`video_${media.id}`}
               style={{ cursor: "pointer" }}
-              src={`https://localhost:4131/post/media/${media.id}`}
+              src={url}
               type={`video/${media.fileType}`}
             />
           </video>

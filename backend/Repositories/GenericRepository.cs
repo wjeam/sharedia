@@ -11,7 +11,7 @@ namespace sharedia.Repositories
 
         protected GenericRepository(IMongoDatabase database)
         {
-            Collection = database.GetCollection<T>(typeof(T).Name);
+            Collection = database.GetCollection<T>(typeof(T).Name.ToLower());
         }
 
         public async Task<T> GetByIdAsync(string id)

@@ -1,10 +1,6 @@
-﻿using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using sharedia.Dtos;
-using sharedia.Models;
 using sharedia.Services;
-using System;
-using System.IO;
 using System.Threading.Tasks;
 using sharedia.Attributes;
 using sharedia.Mapper;
@@ -17,30 +13,10 @@ namespace sharedia.Controllers
     public class PostController : ControllerBase
     {
         private readonly IPostService _postService;
-        private const string StoragePath = @"C:\sharedia";
 
         public PostController(IPostService postService)
         {
             _postService = postService;
-        }
-
-        private async Task<IActionResult> CreatePostAsync(IFormCollection form, string UID)
-        {
-            var postDto = new PostDto
-            {
-                Title = form["title"],
-                Description = form["description"],
-                IsAdult = bool.Parse(form["isAdult"]),
-                UserEmail = form["userEmail"],
-                FileName = form["fileName"],
-                FileType = form["fileType"],
-                MediaType = (MediaType) Enum.Parse(typeof(MediaType), form["mediaType"]),
-                UID = UID,
-            };
-
-            await _postService.CreatePostAsync(postDto);
-
-            return Ok(postDto);
         }
 
         [HttpPost("like")]
@@ -58,35 +34,19 @@ namespace sharedia.Controllers
         }
 
         [HttpPost("create")]
-        public async Task<IActionResult> CreatePostAsync()
+        public async Task<IActionResult> CreatePostAsync([FromForm] PostDto postDto)
         {
-            var file = Request?.Form.Files[0];
-
-            if (file == null)
+            if (postDto == null)
             {
                 return Problem("An error as occured processing your request, please try again later.");
             }
 
-            var form = Request.Form;
+            var file = postDto.File;
+            var post = PostMapper.ToEntity(postDto);
 
-            var UID = Guid.NewGuid().ToString();
-            var newFilePath = $"{StoragePath}/{UID}.{form["fileType"]}";
+            post = await _postService.CreatePostAsync(post, file);
 
-            var postDto = await _postService.CreatePostAsync(form, UID);
-
-            try
-            {
-                await using (var stream = System.IO.File.Create(newFilePath))
-                {
-                    await file.CopyToAsync(stream);
-                }
-
-                return Created("https://localhost:4131/post/media/" + postDto., null);
-            }
-            catch (Exception)
-            {
-                return Problem("An error as occured, please try again later.");
-            }
+            return Created($"/post/{post.Id}", post);
         }
 
         [HttpGet("user/{id}")]
@@ -114,14 +74,8 @@ namespace sharedia.Controllers
         [HttpGet("media/{id}")]
         public async Task<FileResult> GetMediaAsync(string id)
         {
-            var post = await _postService.GetPostAsync(id);
-            var stream = new FileStream($"{StoragePath}/{post.UID}.{post.FileType}", FileMode.Open, FileAccess.Read, FileShare.Read, 4096, FileOptions.Asynchronous);
-            var fileStreamResult = new FileStreamResult(stream, $"{post.MediaType.ToString().ToLower()}/{post.FileType}")
-            {
-                EnableRangeProcessing = true
-            };
-
-            return fileStreamResult;
+            var file = await _postService.GetFileAsync(id);
+            return file;
         }
 
         [HttpGet("all")]

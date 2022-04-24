@@ -11,7 +11,7 @@ namespace sharedia.Filters
         {
             if (!context.HttpContext.Request.Headers.TryGetValue("ApiKey", out var retrievedApiKey))
             {
-                context.Result = new ObjectResult( new { message = "ApiKey header missing from request", statusCode = 401 } );
+                context.Result = new ObjectResult( new { message = "ApiKey header missing from request", status = 401 } );
             }
 
             var configuration = context.HttpContext.RequestServices.GetRequiredService<IConfiguration>();
@@ -19,7 +19,7 @@ namespace sharedia.Filters
 
             if (!retrievedApiKey.Equals(apiKey))
             {
-                context.Result = new ObjectResult( new { message = "ApiKey is not valid", statusCode = 401 } );
+                context.Result = new ObjectResult( new { message = "ApiKey is not valid", status = 401 } );
             }
         }
     }

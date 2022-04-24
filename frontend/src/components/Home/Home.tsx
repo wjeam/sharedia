@@ -24,7 +24,10 @@ const Home: FC<any> = ({ client, isAdult, login, logout }) => {
   const fetchMedia = () => {
     axios({
       method: "GET",
-      url: `https://localhost:4131/post/${!!!isAdult ? "all" : "all-adult"}`,
+      headers: {
+        ApiKey: "12345",
+      },
+      url: `https://localhost:4131/post/${!!!isAdult ? "minor" : "all"}`,
     })
       .then((response: AxiosResponse) => {
         setMedias(response.data);

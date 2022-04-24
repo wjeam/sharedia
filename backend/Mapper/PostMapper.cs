@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using sharedia.Dtos;
 using sharedia.Models;
 
@@ -43,7 +44,7 @@ namespace sharedia.Mapper
                 IsAdult = postDto.IsAdult,
                 MediaType = postDto.MediaType,
                 UserEmail = postDto.UserEmail,
-                UID = postDto.UID,
+                UID = Guid.NewGuid().ToString(),
                 FileName = postDto.FileName,
                 FileType = postDto.FileType
             };

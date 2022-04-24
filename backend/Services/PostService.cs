@@ -1,9 +1,11 @@
 ﻿using System;
-using sharedia.Dtos;
-using sharedia.Mapper;
 using sharedia.Models;
 using System.Collections.Generic;
+using System.IO;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Logging;
 using sharedia.Repositories;
 
 namespace sharedia.Services
@@ -11,19 +13,27 @@ namespace sharedia.Services
     public class PostService : IPostService
     {
         private readonly IPostRepository _postRepository;
+        private readonly ILogger<IPostService> _logger;
 
-        public PostService(IPostRepository postRepository)
+        private const string StoragePath = @"C:\sharedia";
+
+        public PostService(IPostRepository postRepository, ILogger<IPostService> logger)
         {
             _postRepository = postRepository;
+            _logger = logger;
         }
 
-        public async Task<Post> CreatePostAsync(PostDto postDto)
+        public async Task<Post> CreatePostAsync(Post post, IFormFile file)
         {
-            var post = PostMapper.ToEntity(postDto);
-
             try
             {
                 await _postRepository.CreateAsync(post);
+
+                var newFilePath = $"{StoragePath}/{post.UID}.{post.FileType}";
+
+                await using var stream = File.Create(newFilePath);
+
+                await file.CopyToAsync(stream);
             }
             catch (Exception)
             {
@@ -39,7 +49,7 @@ namespace sharedia.Services
             {
                 return await _postRepository.GetByIdAsync(id);
             }
-            catch (Exception)
+            catch (Exception ex)
             {
                 return null;
             }
@@ -51,7 +61,7 @@ namespace sharedia.Services
             {
                 return await _postRepository.GetAllAsync();
             }
-            catch (Exception)
+            catch (Exception ex)
             {
                 return null;
             }
@@ -63,7 +73,7 @@ namespace sharedia.Services
             {
                 return await _postRepository.GetMinorPostsAsync();
             }
-            catch (Exception)
+            catch (Exception ex)
             {
             }
 
@@ -131,8 +141,30 @@ namespace sharedia.Services
                     await _postRepository.UpdateLikesAsync(post, userEmail);
                 }
             }
-            catch (Exception e)
+            catch (Exception)
             {
+            }
+        }
+
+        public async Task<FileResult> GetFileAsync(string id)
+        {
+            var post = await GetPostAsync(id);
+
+            try
+            {
+                var stream = new FileStream($"{StoragePath}/{post.UID}.{post.FileType}", FileMode.Open, FileAccess.Read,
+                    FileShare.Read, 4096, FileOptions.Asynchronous);
+
+                var fileStreamResult = new FileStreamResult(stream, $"{post.MediaType.ToString().ToLower()}/{post.FileType}")
+                {
+                    EnableRangeProcessing = true
+                };
+
+                return fileStreamResult;
+            }
+            catch (Exception)
+            {
+                return null;
             }
         }
 

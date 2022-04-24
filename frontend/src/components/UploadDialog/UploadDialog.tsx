@@ -45,7 +45,7 @@ const UploadDialog: FC<any> = ({ open, toggleOpen, isAdult, loggedUser }) => {
 
       setForm((form) => ({
         ...form,
-        fileName: file.name.split(".")[0].replaceAll(" ", ""),
+        fileName: file.name.split(".")[0].replace(" ", ""),
         fileType: types[1],
         mediaType: types[0][0].toUpperCase() + types[0].substring(1),
         file: file,
@@ -60,11 +60,13 @@ const UploadDialog: FC<any> = ({ open, toggleOpen, isAdult, loggedUser }) => {
       method: "POST",
       data: formData,
       responseType: "json",
+      headers: {
+        ApiKey: "12345",
+      },
       url: "https://localhost:4131/post/create",
     })
       .then((response: AxiosResponse) => {
         window.location.reload();
-        toggleOpen(false);
       })
       .catch((error: AxiosError) => {
         console.error(error);
@@ -79,10 +81,13 @@ const UploadDialog: FC<any> = ({ open, toggleOpen, isAdult, loggedUser }) => {
 
   const formToFormData = () => {
     const formData = new FormData();
+
     for (const [key, value] of Object.entries(form)) {
       formData.append(key, value);
     }
-    formData.append("userEmail", loggedUser?.username);
+
+    formData.set("userEmail", loggedUser.username);
+
     return formData;
   };
 
@@ -131,7 +136,9 @@ const UploadDialog: FC<any> = ({ open, toggleOpen, isAdult, loggedUser }) => {
         <Button
           sx={{ backgroundColor: "red" }}
           variant="contained"
-          onClick={upload}
+          onClick={() => {
+            upload();
+          }}
           disabled={!form.fileName}
         >
           Upload
