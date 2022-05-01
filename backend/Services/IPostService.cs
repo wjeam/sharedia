@@ -16,7 +16,7 @@ namespace sharedia.Services
 
         public Task<IEnumerable<Post>> GetMinorPostsAsync();
 
-        public Task<bool> DeletePostByIdAsync(string id);
+        public Task DeletePostByIdAsync(string id);
 
         public Task<IEnumerable<Post>> GetPostsByUserEmailAsync(string email);
 

@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
+using sharedia.Exceptions;
 using sharedia.Repositories;
 
 namespace sharedia.Services
@@ -49,53 +50,30 @@ namespace sharedia.Services
             {
                 return await _postRepository.GetByIdAsync(id);
             }
-            catch (Exception ex)
+            catch (Exception)
             {
-                return null;
+                throw new PostNotFoundException();
             }
         }
 
         public async Task<IEnumerable<Post>> GetPostsAsync()
         {
-            try
-            {
-                return await _postRepository.GetAllAsync();
-            }
-            catch (Exception ex)
-            {
-                return null;
-            }
+            return await _postRepository.GetAllAsync();
         }
 
         public async Task<IEnumerable<Post>> GetMinorPostsAsync()
         {
-            try
-            {
-                return await _postRepository.GetMinorPostsAsync();
-            }
-            catch (Exception ex)
-            {
-            }
-
-            return null;
+            return await _postRepository.GetMinorPostsAsync();
         }
 
-        public async Task<bool> DeletePostByIdAsync(string id)
+        public async Task DeletePostByIdAsync(string id)
         {
-            try
-            {
-                var result = await _postRepository.DeleteByIdAsync(id);
+            var result = await _postRepository.DeleteByIdAsync(id);
 
-                if (result.IsAcknowledged && result.DeletedCount > 0)
-                {
-                    return true;
-                }
-            }
-            catch (Exception)
+            if (result.IsAcknowledged && result.DeletedCount <= 0)
             {
+                throw new PostNotFoundException();
             }
-
-            return false;
         }
 
         public async Task DislikePostAsync(string postId, string userEmail)
@@ -119,6 +97,7 @@ namespace sharedia.Services
             }
             catch (Exception)
             {
+                throw new PostNotFoundException();
             }
         }
 

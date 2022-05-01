@@ -3,6 +3,8 @@ export default interface IThread {
   content: string;
   userEmail: string;
   creationDateTime: string;
-  threads: [];
+  like: string[];
+  dislike: string[];
+  threads: IThread[];
   parentId: string;
 }

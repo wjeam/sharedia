@@ -1,4 +1,4 @@
-import React, { FC, useEffect, useRef, useState } from "react";
+import { FC, useEffect, useRef, useState } from "react";
 import {
   Card,
   CardContent,
@@ -9,7 +9,6 @@ import {
   IconButton,
   Tooltip,
   Badge,
-  Button,
   Box,
 } from "@mui/material";
 import FavoriteIcon from "@mui/icons-material/Favorite";
@@ -18,6 +17,7 @@ import ShareIcon from "@mui/icons-material/Share";
 import ReplyIcon from "@mui/icons-material/Reply";
 import axios, { AxiosError, AxiosResponse } from "axios";
 import { MediaType } from "../../models/MediaType";
+import { config } from "../../Config";
 
 const MediaCard: FC<any> = ({
   media,
@@ -31,42 +31,42 @@ const MediaCard: FC<any> = ({
   const videoRef = useRef<HTMLVideoElement>(null);
 
   useEffect(() => {
+    const fetchFile = () => {
+      axios({
+        method: "GET",
+        headers: {
+          ApiKey: config.apiKey,
+        },
+        responseType: "arraybuffer",
+        url: `https://localhost:4131/post/media/${media.id}`,
+      })
+        .then((response: AxiosResponse) => {
+          switch (media.mediaType) {
+            case MediaType.Image:
+              let type = response.headers["Content-Type"];
+              let imageBlob = new Blob([response.data], { type: type });
+
+              setUrl(URL.createObjectURL(imageBlob));
+              break;
+            case MediaType.Video:
+              let video = new File([response.data], media.fileName);
+              setUrl(URL.createObjectURL(video));
+              break;
+          }
+        })
+        .catch((error: AxiosError) => {
+          console.error(error);
+        });
+    };
+
     fetchFile();
   }, []);
 
   useEffect(() => {
-    if (media.mediaType == 0) {
+    if (media.mediaType === 0) {
       videoRef.current?.load();
     }
   }, [url]);
-
-  const fetchFile = () => {
-    axios({
-      method: "GET",
-      headers: {
-        ApiKey: "12345",
-      },
-      responseType: "arraybuffer",
-      url: `https://localhost:4131/post/media/${media.id}`,
-    })
-      .then((response: AxiosResponse) => {
-        switch (media.mediaType) {
-          case MediaType.Image:
-            let type = response.headers["Content-Type"];
-            let imageBlob = new Blob([response.data], { type: type });
-
-            setUrl(URL.createObjectURL(imageBlob));
-            break;
-          case MediaType.Video:
-            let video = new File([response.data], media.fileName);
-            setUrl(URL.createObjectURL(video));
-            break;
-        }
-      })
-      .catch((error: AxiosError) => {
-        console.error(error);
-      });
-  };
 
   const likePost = () => {
     if (!!!currentUser) return;
@@ -74,7 +74,7 @@ const MediaCard: FC<any> = ({
     axios({
       method: "POST",
       headers: {
-        ApiKey: "12345",
+        ApiKey: config.apiKey,
       },
       url: `https://localhost:4131/post/like?postId=${media.id}&userEmail=${currentUser}`,
     })
@@ -88,13 +88,13 @@ const MediaCard: FC<any> = ({
           setLikes((likes: any) => [...likes, currentUser]);
         } else {
           setLikes((likes: any) =>
-            likes.filter((email: string) => email != currentUser)
+            likes.filter((email: string) => email !== currentUser)
           );
         }
 
         if (postDisliked) {
           setDislikes((dislikes: any) =>
-            dislikes.filter((email: string) => email != currentUser)
+            dislikes.filter((email: string) => email !== currentUser)
           );
         }
       })
@@ -114,7 +114,7 @@ const MediaCard: FC<any> = ({
     axios({
       method: "POST",
       headers: {
-        ApiKey: "12345",
+        ApiKey: config.apiKey,
       },
       url: `https://localhost:4131/post/dislike?postId=${media.id}&userEmail=${currentUser}`,
     })
@@ -126,13 +126,13 @@ const MediaCard: FC<any> = ({
           setDislikes((dislikes: any) => [...dislikes, currentUser]);
         } else {
           setDislikes((dislikes: any) =>
-            dislikes.filter((email: string) => email != currentUser)
+            dislikes.filter((email: string) => email !== currentUser)
           );
         }
 
         if (postLiked) {
           setLikes((likes: any) =>
-            likes.filter((email: string) => email != currentUser)
+            likes.filter((email: string) => email !== currentUser)
           );
         }
       })
@@ -150,7 +150,7 @@ const MediaCard: FC<any> = ({
         mb: 7,
       }}
     >
-      {media.mediaType == MediaType.Image ? (
+      {media.mediaType === MediaType.Image ? (
         <CardMedia
           onClick={() => {
             toggleOpenPost(true, media);
@@ -229,7 +229,9 @@ const MediaCard: FC<any> = ({
             <IconButton
               sx={{
                 ":hover": { color: "red" },
-                color: currentUser in likes ? "red" : "rgba(0, 0, 0, 0.5)",
+                color: likes.includes(currentUser)
+                  ? "red"
+                  : "rgba(0, 0, 0, 0.5)",
               }}
               onClick={likePost}
             >
@@ -242,8 +244,9 @@ const MediaCard: FC<any> = ({
             <IconButton
               sx={{
                 ":hover": { color: "orange" },
-                color:
-                  currentUser in dislikes ? "orange" : "rgba(0, 0, 0, 0.5)",
+                color: dislikes.includes(currentUser)
+                  ? "orange"
+                  : "rgba(0, 0, 0, 0.5)",
               }}
               onClick={dislikePost}
             >
@@ -255,8 +258,11 @@ const MediaCard: FC<any> = ({
           <Tooltip title="Comment">
             <IconButton
               sx={{
-                ":hover": { color: "pink" },
+                ":hover": { color: "green" },
                 color: "rgba(0, 0, 0, 0.5)",
+              }}
+              onClick={() => {
+                toggleOpenPost(true, media);
               }}
             >
               <ReplyIcon />

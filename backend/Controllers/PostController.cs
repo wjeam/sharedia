@@ -23,14 +23,14 @@ namespace sharedia.Controllers
         public async Task<IActionResult> LikePostAsync(string postId, string userEmail)
         {
             await _postService.LikePostAsync(postId, userEmail);
-            return Ok();
+            return NoContent();
         }
 
         [HttpPost("dislike")]
         public async Task<IActionResult> DislikePostAsync(string postId, string userEmail)
         {
             await _postService.DislikePostAsync(postId, userEmail);
-            return Ok();
+            return NoContent();
         }
 
         [HttpPost("create")]
@@ -60,7 +60,7 @@ namespace sharedia.Controllers
         public async Task<IActionResult> DeletePostAsync(string id)
         {
             await _postService.DeletePostByIdAsync(id);
-            return Accepted();
+            return NoContent();
         }
 
         [HttpGet("minor")]

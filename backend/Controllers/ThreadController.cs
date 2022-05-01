@@ -1,8 +1,10 @@
+using System;
 using Microsoft.AspNetCore.Mvc;
 using sharedia.Dtos;
 using sharedia.Services;
 using System.Threading.Tasks;
 using sharedia.Attributes;
+using sharedia.Exceptions;
 using sharedia.Mapper;
 
 namespace sharedia.Controllers
@@ -24,18 +26,61 @@ namespace sharedia.Controllers
         {
             var thread = ThreadMapper.ToEntity(threadDto);
 
-            await _threadService.CreateThreadAsync(thread);
+            try
+            {
+                await _threadService.CreateThreadAsync(thread);
 
-            return Ok(thread);
+                return Created($"/thread/{thread.Id}", thread);
+            }
+            catch (Exception)
+            {
+                return Problem("An error has occured while creating thread, please try again later", title: "Internal server error",statusCode: 500);
+            }
         }
 
+        [HttpPost("like")]
+        public async Task<IActionResult> LikeThreadAsync([FromQuery] string threadId, [FromQuery] string userEmail)
+        {
+            try
+            {
+                await _threadService.LikeThreadAsync(threadId, userEmail);
+
+                return NoContent();
+            }
+            catch (ThreadNotFoundException)
+            {
+                return Problem($"Thread identified by id {threadId} does not exists.", title: "Not found", statusCode: 404);
+            }
+        }
+
+        [HttpPost("dislike")]
+        public async Task<IActionResult> DislikeThreadAsync([FromQuery] string threadId, [FromQuery] string userEmail)
+        {
+            try
+            {
+                await _threadService.DislikeThreadAsync(threadId, userEmail);
+
+                return NoContent();
+            }
+            catch (ThreadNotFoundException)
+            {
+                return Problem($"Thread identified by id {threadId} does not exists.", title: "Not found", statusCode: 404);
+            }
+        }
 
         [HttpGet("{parentId}")]
         public async Task<IActionResult> GetAllThreadsByParentId(string parentId)
         {
-            var threads = await _threadService.GetAllThreadByParentIdAsync(parentId);
+            try
+            {
+                var threads = await _threadService.GetAllThreadByParentIdAsync(parentId);
 
-            return Ok(threads);
+                return Ok(threads);
+            }
+            catch (ThreadNotFoundException)
+            {
+                return Problem($"Thread identified by id {parentId} does not exists.", title: "Not found", statusCode: 404);
+            }
         }
     }
 }

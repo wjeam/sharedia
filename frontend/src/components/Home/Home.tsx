@@ -1,14 +1,13 @@
-import React, { useEffect, useState, FC } from "react";
+import { useEffect, useState, FC } from "react";
 import axios, { AxiosError, AxiosResponse } from "axios";
 import { Box } from "@mui/system";
 import MediaCard from "../MediaCard/MediaCard";
 import { IMedia } from "../../models/IMedia";
-import { Grid, Badge, SelectChangeEvent } from "@mui/material";
+import { Grid, Badge } from "@mui/material";
 import PostDialog from "../PostDialog/PostDialog";
 import { FilterType } from "../../models/FilterType";
 import Navbar from "../Navbar/Navbar";
-import Thread from "../Thread/Thread";
-import { motion } from "framer-motion";
+import { config } from "../../Config";
 
 const Home: FC<any> = ({ client, isAdult, login, logout }) => {
   const [medias, setMedias] = useState([]);
@@ -18,24 +17,24 @@ const Home: FC<any> = ({ client, isAdult, login, logout }) => {
   const [search, setSearch] = useState<string>("");
 
   useEffect(() => {
+    const fetchMedia = () => {
+      axios({
+        method: "GET",
+        headers: {
+          ApiKey: config.apiKey,
+        },
+        url: `https://localhost:4131/post/${!!!isAdult ? "minor" : "all"}`,
+      })
+        .then((response: AxiosResponse) => {
+          setMedias(response.data);
+        })
+        .catch((error: AxiosError) => {
+          console.error(error);
+        });
+    };
+
     fetchMedia();
   }, [isAdult]);
-
-  const fetchMedia = () => {
-    axios({
-      method: "GET",
-      headers: {
-        ApiKey: "12345",
-      },
-      url: `https://localhost:4131/post/${!!!isAdult ? "minor" : "all"}`,
-    })
-      .then((response: AxiosResponse) => {
-        setMedias(response.data);
-      })
-      .catch((error: AxiosError) => {
-        console.error(error);
-      });
-  };
 
   const toggleOpenPost = (value: boolean, media?: IMedia) => {
     setPostDialogOpen(value);
@@ -82,6 +81,7 @@ const Home: FC<any> = ({ client, isAdult, login, logout }) => {
       .map((media: IMedia) => {
         media.like = ratings.likes;
         media.dislike = ratings.dislikes;
+        return media;
       });
   };
 
@@ -125,6 +125,7 @@ const Home: FC<any> = ({ client, isAdult, login, logout }) => {
           open={postDialogOpen}
           toggleOpen={toggleOpenPost}
           media={postShown}
+          currentUser={client?.getActiveAccount()?.username}
         ></PostDialog>
       )}
     </>

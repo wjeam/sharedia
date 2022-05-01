@@ -9,5 +9,9 @@ namespace sharedia.Services
         Task CreateThreadAsync(Thread thread);
 
         Task<List<Thread>> GetAllThreadByParentIdAsync(string parentId);
+
+        Task DislikeThreadAsync(string parentId, string userEmail);
+
+        Task LikeThreadAsync(string parentId, string userEmail);
     }
 }

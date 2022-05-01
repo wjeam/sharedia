@@ -19,7 +19,7 @@ namespace sharedia.Models
         [BsonElement("creationDateTime")]
         public DateTime CreationDateTime { get; set; } =  DateTime.Now;
         [BsonElement("isAdult")]
-        public bool IsAdult { get; set; } = false;
+        public bool IsAdult { get; set; }
         [BsonElement("userEmail")]
         public string UserEmail { get; set; }
         [BsonElement("fileName")]

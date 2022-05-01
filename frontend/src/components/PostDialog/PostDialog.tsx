@@ -1,40 +1,46 @@
-import { Box, Button, Dialog, Grid, Paper, Typography } from "@mui/material";
+import { Button, Dialog, Grid } from "@mui/material";
 import axios, { AxiosResponse } from "axios";
 import { FC, useEffect, useRef, useState } from "react";
+import { config } from "../../Config";
 import IThread from "../../models/IThread";
 import { MediaType } from "../../models/MediaType";
+import Comment from "../Comment/Comment";
 import Thread from "../Thread/Thread";
 
-const PostDialog: FC<any> = ({ open, toggleOpen, media }) => {
+const PostDialog: FC<any> = ({ open, toggleOpen, media, currentUser }) => {
   const [image, setImage] = useState<HTMLImageElement | undefined>(undefined);
-  const [video, setVideo] = useState<HTMLVideoElement | null>(null);
 
   const videoRef = useRef<HTMLVideoElement | null>(null);
   const sourceRef = useRef<HTMLSourceElement | null>(null);
 
-  const [threads, setThreads] = useState([]);
+  const [threads, setThreads] = useState<IThread[]>([]);
+  const [showComment, setShowComment] = useState<boolean>();
 
   useEffect(() => {
+    const fetchThreads = () => {
+      axios({
+        method: "GET",
+        url: `https://localhost:4131/thread/${media.id}`,
+        headers: {
+          ApiKey: config.apiKey,
+        },
+        responseType: "json",
+      }).then((response: AxiosResponse) => {
+        setThreads(response.data);
+      });
+    };
+
     fetchThreads();
   }, []);
-
-  const fetchThreads = () => {
-    axios({
-      method: "GET",
-      url: `https://localhost:4131/thread/${media.id}`,
-      headers: {
-        ApiKey: "12345",
-      },
-      responseType: "json",
-    }).then((response: AxiosResponse) => {
-      setThreads(response.data);
-    });
-  };
 
   const handleOnClose = (_: any, reason: string) => {
     if (reason === "backdropClick") {
       toggleOpen(false, undefined);
     }
+  };
+
+  const addThread = (thread: IThread) => {
+    setThreads((threads: IThread[]) => [...threads, thread]);
   };
 
   useEffect(() => {
@@ -43,7 +49,7 @@ const PostDialog: FC<any> = ({ open, toggleOpen, media }) => {
     axios({
       method: "GET",
       headers: {
-        ApiKey: "12345",
+        ApiKey: config.apiKey,
       },
       responseType: "arraybuffer",
       url: `https://localhost:4131/post/media/${media.id}`,
@@ -76,9 +82,9 @@ const PostDialog: FC<any> = ({ open, toggleOpen, media }) => {
   }, [open]);
 
   useEffect(() => {
-    if (video == null || videoRef.current == null) return;
+    if (videoRef.current === null) return;
     videoRef.current.load();
-  }, [video]);
+  }, []);
 
   return (
     <Dialog
@@ -90,7 +96,7 @@ const PostDialog: FC<any> = ({ open, toggleOpen, media }) => {
       <Grid container flexDirection={"column"}>
         <Grid item alignSelf="center">
           {media &&
-            (media.mediaType == MediaType.Image ? (
+            (media.mediaType === MediaType.Image ? (
               <img
                 src={image?.src}
                 style={{
@@ -103,35 +109,86 @@ const PostDialog: FC<any> = ({ open, toggleOpen, media }) => {
                 }}
               />
             ) : (
-              <video ref={videoRef} controls>
+              <video
+                ref={videoRef}
+                controls
+                style={{
+                  marginLeft: "auto",
+                  marginTop: "2em",
+                  marginRight: "auto",
+                  marginBottom: "2em",
+                  cursor: "pointer",
+                }}
+              >
                 <source
                   id={`dialog_video_${media?.id}`}
                   ref={sourceRef}
-                  style={{ cursor: "pointer" }}
                   type={`video/${media.fileType}`}
                 />
               </video>
             ))}
         </Grid>
-        <Grid item alignSelf="flex-end">
-          <Button
-            sx={{
-              color: "white",
-              fontSize: "0.7em",
-              mr: 5,
-              px: 3,
-              mb: "2em",
-              backgroundColor: "rgba(0, 0, 0, 0.3)",
-            }}
-          >
-            Post a reply!
-          </Button>
+        {currentUser && (
+          <Grid item alignSelf="flex-end">
+            <Button
+              sx={{
+                color: "white",
+                fontSize: "0.7em",
+                mr: 2,
+                px: 3,
+                py: 1,
+                mb: "2em",
+                backgroundColor: "rgba(0, 0, 0, 0.3)",
+                ":hover": {
+                  backgroundColor: "rgba(0, 0, 0, 0.6)",
+                },
+              }}
+              onClick={() => {
+                setShowComment(!showComment);
+              }}
+            >
+              Post a reply!
+            </Button>
+
+            <Button
+              sx={{
+                color: "white",
+                fontSize: "0.7em",
+                mr: 5,
+                px: 3,
+                py: 1,
+                mb: "2em",
+                backgroundColor: "rgba(255, 0, 0, 0.6)",
+                ":hover": {
+                  backgroundColor: "rgba(255, 0, 0, 0.8)",
+                },
+              }}
+              onClick={() => {}}
+            >
+              Delete post
+            </Button>
+          </Grid>
+        )}
+        <Grid item sx={{ px: 2 }}>
+          {showComment && (
+            <Comment
+              closeComment={setShowComment}
+              parentId={media.id}
+              userEmail={currentUser}
+              addThread={addThread}
+              rows={4}
+            ></Comment>
+          )}
         </Grid>
-        <Grid item>
+        <Grid item mb={1}>
           {threads &&
             threads.map((thread: IThread) => {
               return (
-                <Thread thread={thread} userEmail={media.userEmail}></Thread>
+                <Thread
+                  thread={thread}
+                  isParent={true}
+                  currentUser={currentUser}
+                ></Thread>
               );
             })}
         </Grid>

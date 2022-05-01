@@ -10,6 +10,7 @@ import {
 } from "@mui/material";
 import axios, { AxiosResponse, AxiosError } from "axios";
 import React, { useState, FC } from "react";
+import { config } from "../../Config";
 import { IPost } from "../../models/IPost";
 
 const UploadDialog: FC<any> = ({ open, toggleOpen, isAdult, loggedUser }) => {
@@ -61,7 +62,7 @@ const UploadDialog: FC<any> = ({ open, toggleOpen, isAdult, loggedUser }) => {
       data: formData,
       responseType: "json",
       headers: {
-        ApiKey: "12345",
+        ApiKey: config.apiKey,
       },
       url: "https://localhost:4131/post/create",
     })

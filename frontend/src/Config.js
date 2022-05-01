@@ -4,5 +4,6 @@ export const config = {
     scopes: [
         'user.read'
     ],
-    authority: 'https://login.microsoftonline.com/consumers/'
+    authority: 'https://login.microsoftonline.com/consumers/',
+    apiKey: "12345"
 }
