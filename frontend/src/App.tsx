@@ -1,28 +1,24 @@
-import {
-  AuthenticationResult,
-  PublicClientApplication,
-} from "@azure/msal-browser";
+import { PublicClientApplication } from "@azure/msal-browser";
 import "./App.css";
 import Home from "./components/Home/Home";
-import Navbar from "./components/Navbar/Navbar";
 import { config } from "./Config";
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import axios, { AxiosResponse } from "axios";
 
-const App = () => {
-  const client = new PublicClientApplication({
-    auth: {
-      clientId: config.clientId,
-      redirectUri: config.redirectUri,
-      authority: config.authority,
-    },
-    cache: {
-      cacheLocation: "sessionStorage",
-      secureCookies: true,
-      storeAuthStateInCookie: true,
-    },
-  });
+const client = new PublicClientApplication({
+  auth: {
+    clientId: config.clientId,
+    redirectUri: config.redirectUri,
+    authority: config.authority,
+  },
+  cache: {
+    cacheLocation: "sessionStorage",
+    secureCookies: true,
+    storeAuthStateInCookie: true,
+  },
+});
 
+const App = () => {
   const loginRequest = {
     scopes: [
       "User.Read",
@@ -43,11 +39,11 @@ const App = () => {
     ],
   };
 
-  const [isAdult, setIsAdult] = useState<boolean | undefined>(undefined);
+  const [isAdult, setIsAdult] = useState<boolean | null>(null);
 
   const acquireToken = () => {
     client
-      .acquireTokenSilent(accessTokenRequest)
+      ?.acquireTokenSilent(accessTokenRequest)
       .then((accessTokenResponse: any) => {
         fetchAge(accessTokenResponse?.accessToken);
       });
@@ -60,24 +56,32 @@ const App = () => {
       headers: {
         Authorization: "Bearer " + token,
       },
-    }).then((response: AxiosResponse) => {
-      const age = response?.data?.value[0]?.ageGroup;
-      setIsAdult(age == 3 ? true : false);
-    });
+    })
+      .then((response: AxiosResponse) => {
+        const age = response?.data?.value[0]?.ageGroup;
+        setIsAdult(age == 3 ? true : false);
+      })
+      .catch((error) => console.log(error));
   };
 
   useEffect(() => {
-    if (client.getAllAccounts().length === 0 || !!!client.getActiveAccount())
-      return;
-    acquireToken();
+    if (client === null) return;
+
+    if (client?.getAllAccounts().length === 0) {
+      console.log(client?.getActiveAccount());
+      console.log(client?.getAllAccounts());
+      setIsAdult(false);
+    } else {
+      acquireToken();
+    }
   }, [client]);
 
   const login = async () => {
-    client.loginRedirect(loginRequest);
+    client?.loginRedirect(loginRequest);
   };
 
   const logout = async () => {
-    client.logoutRedirect();
+    client?.logoutRedirect();
   };
 
   return (

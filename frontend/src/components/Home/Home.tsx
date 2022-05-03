@@ -17,13 +17,15 @@ const Home: FC<any> = ({ client, isAdult, login, logout }) => {
   const [search, setSearch] = useState<string>("");
 
   useEffect(() => {
+    if (isAdult === null) return;
+
     const fetchMedia = () => {
       axios({
         method: "GET",
         headers: {
           ApiKey: config.apiKey,
         },
-        url: `https://localhost:4131/post/${!!!isAdult ? "minor" : "all"}`,
+        url: `https://localhost:4131/post/${!isAdult ? "minor" : "all"}`,
       })
         .then((response: AxiosResponse) => {
           setMedias(response.data);

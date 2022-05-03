@@ -155,7 +155,7 @@ const PostDialog: FC<any> = ({ open, toggleOpen, media, currentUser }) => {
                 color: "white",
                 fontSize: "0.7em",
                 mr: 5,
-                px: 3,
+                px: 1,
                 py: 1,
                 mb: "2em",
                 backgroundColor: "rgba(255, 0, 0, 0.6)",

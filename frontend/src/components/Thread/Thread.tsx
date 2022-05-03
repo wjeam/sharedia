@@ -15,7 +15,7 @@ import IThread from "../../models/IThread";
 import { config } from "../../Config";
 
 const Thread: FC<any> = ({ thread, currentUser, isParent }) => {
-  const [subthreads, setSubThreads] = useState<any[]>([]);
+  const [subthreads, setSubThreads] = useState<IThread[]>([]);
   const [showComment, setShowComment] = useState(false);
   const [showReplies, setShowReplies] = useState(false);
   const [repliesFetched, setRepliesFetched] = useState(false);
@@ -31,12 +31,13 @@ const Thread: FC<any> = ({ thread, currentUser, isParent }) => {
       responseType: "json",
     }).then((response: AxiosResponse) => {
       setSubThreads(response.data);
+      setRepliesFetched(true);
     });
   };
 
   const addThread = (thread: any) => {
     setSubThreads((subthreads: any[]) => [...subthreads, thread]);
-    setRepliesFetched(true);
+    fetchSubThreads();
   };
 
   const likeThread = () => {
@@ -197,7 +198,7 @@ const Thread: FC<any> = ({ thread, currentUser, isParent }) => {
               },
             }}
             onClick={() => {
-              if (subthreads.length <= 0) {
+              if (!repliesFetched) {
                 fetchSubThreads();
                 setRepliesFetched(true);
               }

@@ -29,7 +29,7 @@ const Navbar: FC<any> = ({
   sort,
 }) => {
   const [uploadDialogOpen, setUploadDialogOpen] = useState(false);
-  const [loggedUser, setLoggedUser] = useState<AccountInfo>();
+  const [loggedUser, setLoggedUser] = useState<AccountInfo | null>(null);
 
   useEffect(() => {
     if (client == null) return;
@@ -41,7 +41,9 @@ const Navbar: FC<any> = ({
       });
     };
 
-    registerRedirect();
+    if (loggedUser == null) {
+      registerRedirect();
+    }
   }, [client]);
 
   const handleSearchChange = (event: any) => {
