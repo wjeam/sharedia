@@ -14,15 +14,21 @@ import Comment from "../Comment/Comment";
 import IThread from "../../models/IThread";
 import { config } from "../../Config";
 
-const Thread: FC<any> = ({ thread, currentUser, isParent }) => {
+const Thread: FC<any> = ({
+  thread,
+  currentUser,
+  isParent,
+  deleteParentThread,
+  deleteParentSubThread,
+}) => {
   const [subthreads, setSubThreads] = useState<IThread[]>([]);
   const [showComment, setShowComment] = useState(false);
   const [showReplies, setShowReplies] = useState(false);
   const [repliesFetched, setRepliesFetched] = useState(false);
   const [self, setSelf] = useState<IThread>(thread);
 
-  const fetchSubThreads = () => {
-    axios({
+  const fetchSubThreads = async () => {
+    return await axios({
       method: "GET",
       url: `https://localhost:4131/thread/${thread.id}`,
       headers: {
@@ -35,9 +41,23 @@ const Thread: FC<any> = ({ thread, currentUser, isParent }) => {
     });
   };
 
-  const addThread = (thread: any) => {
-    setSubThreads((subthreads: any[]) => [...subthreads, thread]);
+  const addThread = () => {
     fetchSubThreads();
+  };
+
+  const deleteSubThread = (id: string) => {
+    axios({
+      method: "DELETE",
+      url: `https://localhost:4131/thread/${id}`,
+      headers: {
+        ApiKey: config.apiKey,
+      },
+      responseType: "json",
+    }).then((response: AxiosResponse) => {
+      setSubThreads(
+        subthreads.filter((subthread: IThread) => subthread.id != id)
+      );
+    });
   };
 
   const likeThread = () => {
@@ -111,13 +131,12 @@ const Thread: FC<any> = ({ thread, currentUser, isParent }) => {
     <Grid
       direction="column"
       container
-      sx={{ borderLeft: !isParent ? "2px solid gray" : "0" }}
+      sx={{ borderLeft: !isParent ? "2px solid gray" : "0", ml: 1 }}
     >
       <Grid item sx={{ mb: 1, px: 2, mt: 1 }}>
         <Box
           sx={{
             backgroundColor: "rgba(255, 255, 255, 0.6)",
-            borderRadius: "0.5em",
           }}
         >
           <Typography variant="caption">
@@ -215,6 +234,30 @@ const Thread: FC<any> = ({ thread, currentUser, isParent }) => {
                   subthreads.length > 0 ? `(${subthreads.length})` : ``
                 }`}
           </Button>
+          {currentUser && thread.userEmail == currentUser && (
+            <Button
+              sx={{
+                color: "white",
+                fontSize: "0.7em",
+                mb: 1,
+                ml: 2,
+                py: 0,
+                backgroundColor: "rgba(0, 0, 0, 0.3)",
+                ":hover": {
+                  backgroundColor: "rgba(255, 0, 0, 0.6)",
+                },
+              }}
+              onClick={() => {
+                if (typeof deleteParentThread == "function") {
+                  deleteParentThread(thread.id);
+                } else if (typeof deleteParentSubThread == "function") {
+                  deleteParentSubThread(thread.id);
+                }
+              }}
+            >
+              Delete
+            </Button>
+          )}
         </Box>
       </Grid>
       <Grid item px={2}>
@@ -222,7 +265,7 @@ const Thread: FC<any> = ({ thread, currentUser, isParent }) => {
           <Comment
             closeComment={setShowComment}
             parentId={self.id}
-            userEmail={self.userEmail}
+            userEmail={currentUser}
             addThread={addThread}
           ></Comment>
         )}
@@ -230,8 +273,10 @@ const Thread: FC<any> = ({ thread, currentUser, isParent }) => {
           subthreads.map((subthread) => {
             return (
               <Thread
+                key={subthread.id}
                 thread={subthread}
                 isParent={false}
+                deleteParentSubThread={deleteSubThread}
                 currentUser={currentUser}
               ></Thread>
             );

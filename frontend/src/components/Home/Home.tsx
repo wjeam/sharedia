@@ -38,6 +38,20 @@ const Home: FC<any> = ({ client, isAdult, login, logout }) => {
     fetchMedia();
   }, [isAdult]);
 
+  const deleteMedia = (id: string) => {
+    axios({
+      method: "DELETE",
+      url: `https://localhost:4131/post/${id}`,
+      headers: {
+        ApiKey: config.apiKey,
+      },
+      responseType: "json",
+    }).then((response: AxiosResponse) => {
+      setMedias(medias.filter((media: IMedia) => media.id != id));
+      toggleOpenPost(false);
+    });
+  };
+
   const toggleOpenPost = (value: boolean, media?: IMedia) => {
     setPostDialogOpen(value);
     setPostShown(media);
@@ -103,7 +117,16 @@ const Home: FC<any> = ({ client, isAdult, login, logout }) => {
         <Grid container textAlign={"center"}>
           {sortBy(sort, medias).map((media: IMedia) => {
             return (
-              <Grid item xl={3} md={6} sm={6} xs={12} lg={3} alignSelf="center">
+              <Grid
+                item
+                xl={3}
+                md={6}
+                sm={6}
+                xs={12}
+                lg={3}
+                key={media.id}
+                alignSelf="center"
+              >
                 <Badge
                   key={media.id}
                   badgeContent={"18+"}
@@ -127,6 +150,7 @@ const Home: FC<any> = ({ client, isAdult, login, logout }) => {
           open={postDialogOpen}
           toggleOpen={toggleOpenPost}
           media={postShown}
+          deleteMedia={deleteMedia}
           currentUser={client?.getActiveAccount()?.username}
         ></PostDialog>
       )}

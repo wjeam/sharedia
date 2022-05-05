@@ -74,6 +74,23 @@ const Comment: FC<any> = ({
         >
           Post
         </Button>
+        <Button
+          sx={{
+            color: "white",
+            fontSize: "0.7em",
+            py: 0,
+            ml: 1,
+            backgroundColor: "rgba(0, 0, 0, 0.3)",
+            ":hover": {
+              backgroundColor: "rgba(0, 0, 0, 0.6)",
+            },
+          }}
+          onClick={() => {
+            closeComment();
+          }}
+        >
+          Cancel
+        </Button>
       </Grid>
     </Grid>
   );

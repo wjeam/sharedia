@@ -17,6 +17,7 @@ import { Add, Menu, NoMeetingRoom, AccountCircle } from "@mui/icons-material";
 import React, { useState, FC, useEffect } from "react";
 import UploadDialog from "../UploadDialog/UploadDialog";
 import { AccountInfo, AuthenticationResult } from "@azure/msal-browser";
+import WarningAmberIcon from "@mui/icons-material/WarningAmber";
 
 const Navbar: FC<any> = ({
   login,
@@ -168,6 +169,11 @@ const Navbar: FC<any> = ({
                 >
                   {loggedUser?.username}
                 </Typography>
+                <IconButton>
+                  <Tooltip title="Reports">
+                    <WarningAmberIcon sx={{ fontSize: 25 }} />
+                  </Tooltip>
+                </IconButton>
                 <IconButton onClick={logout}>
                   <Tooltip title="Logout">
                     <NoMeetingRoom sx={{ fontSize: 25 }} />

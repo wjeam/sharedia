@@ -12,6 +12,7 @@ import axios, { AxiosResponse, AxiosError } from "axios";
 import React, { useState, FC } from "react";
 import { config } from "../../Config";
 import { IPost } from "../../models/IPost";
+import "./UploadDialog.scss";
 
 const UploadDialog: FC<any> = ({ open, toggleOpen, isAdult, loggedUser }) => {
   const [form, setForm] = React.useState<IPost>({
@@ -93,7 +94,7 @@ const UploadDialog: FC<any> = ({ open, toggleOpen, isAdult, loggedUser }) => {
   };
 
   return (
-    <Dialog open={open} onClose={handleBackdropClick}>
+    <Dialog open={open} onClose={handleBackdropClick} className="dialog">
       <DialogContent>
         <Typography variant="h5">Upload media</Typography>
         <TextField
@@ -119,7 +120,7 @@ const UploadDialog: FC<any> = ({ open, toggleOpen, isAdult, loggedUser }) => {
             control={<Checkbox id="isAdult" />}
             value={form.isAdult === true ? "off" : "on"}
             onChange={handleCheckbox}
-            label="Is adult?"
+            label="18+"
             sx={{ display: "block" }}
           />
         )}

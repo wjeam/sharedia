@@ -1,13 +1,21 @@
-import { Button, Dialog, Grid } from "@mui/material";
+import { Button, Dialog, Grid, Typography } from "@mui/material";
 import axios, { AxiosResponse } from "axios";
 import { FC, useEffect, useRef, useState } from "react";
 import { config } from "../../Config";
 import IThread from "../../models/IThread";
 import { MediaType } from "../../models/MediaType";
 import Comment from "../Comment/Comment";
+import ReportButton from "../Report/ReportButton";
 import Thread from "../Thread/Thread";
+import "./PostDialog.scss";
 
-const PostDialog: FC<any> = ({ open, toggleOpen, media, currentUser }) => {
+const PostDialog: FC<any> = ({
+  open,
+  toggleOpen,
+  media,
+  currentUser,
+  deleteMedia,
+}) => {
   const [image, setImage] = useState<HTMLImageElement | undefined>(undefined);
 
   const videoRef = useRef<HTMLVideoElement | null>(null);
@@ -81,6 +89,19 @@ const PostDialog: FC<any> = ({ open, toggleOpen, media, currentUser }) => {
     });
   }, [open]);
 
+  const deleteThread = (id: string) => {
+    axios({
+      method: "DELETE",
+      url: `https://localhost:4131/thread/${id}`,
+      headers: {
+        ApiKey: config.apiKey,
+      },
+      responseType: "json",
+    }).then((response: AxiosResponse) => {
+      setThreads(threads.filter((thread: IThread) => thread.id != id));
+    });
+  };
+
   useEffect(() => {
     if (videoRef.current === null) return;
     videoRef.current.load();
@@ -128,15 +149,30 @@ const PostDialog: FC<any> = ({ open, toggleOpen, media, currentUser }) => {
               </video>
             ))}
         </Grid>
+        <Grid item px={3} mb={!currentUser ? 5 : 0}>
+          <Typography variant="body2">
+            <Typography variant="caption">
+              Posted by {media.userEmail}
+            </Typography>
+          </Typography>
+          <Typography variant="h6" sx={{ color: "rgba(0, 0, 0, 0.8)" }}>
+            {media.title}
+          </Typography>
+          <Typography mt={1} variant="body2">
+            {media.description}
+          </Typography>
+        </Grid>
         {currentUser && (
-          <Grid item alignSelf="flex-end">
+          <Grid item mt={5}>
             <Button
               sx={{
                 color: "white",
                 fontSize: "0.7em",
-                mr: 2,
-                px: 3,
-                py: 1,
+                mr: 1,
+                px: 2,
+                ml: 3,
+                textTransform: "capitalize",
+                py: 0.5,
                 mb: "2em",
                 backgroundColor: "rgba(0, 0, 0, 0.3)",
                 ":hover": {
@@ -149,23 +185,29 @@ const PostDialog: FC<any> = ({ open, toggleOpen, media, currentUser }) => {
             >
               Post a reply!
             </Button>
-
+            <ReportButton
+              postId={media.id}
+              reporterEmail={currentUser}
+            ></ReportButton>
             <Button
               sx={{
                 color: "white",
                 fontSize: "0.7em",
-                mr: 5,
-                px: 1,
-                py: 1,
+                mr: 1,
+                px: 2,
+                py: 0.5,
+                textTransform: "capitalize",
                 mb: "2em",
                 backgroundColor: "rgba(255, 0, 0, 0.6)",
                 ":hover": {
                   backgroundColor: "rgba(255, 0, 0, 0.8)",
                 },
               }}
-              onClick={() => {}}
+              onClick={() => {
+                deleteMedia(media.id);
+              }}
             >
-              Delete post
+              Delete
             </Button>
           </Grid>
         )}
@@ -185,8 +227,10 @@ const PostDialog: FC<any> = ({ open, toggleOpen, media, currentUser }) => {
             threads.map((thread: IThread) => {
               return (
                 <Thread
+                  key={thread.id}
                   thread={thread}
                   isParent={true}
+                  deleteParentThread={deleteThread}
                   currentUser={currentUser}
                 ></Thread>
               );

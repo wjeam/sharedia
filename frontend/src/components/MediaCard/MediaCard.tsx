@@ -217,7 +217,9 @@ const MediaCard: FC<any> = ({
             color: "rgba(0, 0, 0, 0.7)",
           }}
         >
-          {media.description}
+          {media.description.length > 150
+            ? `${media.description.substring(0, 250)}...`
+            : media.description}
         </Typography>
       </CardContent>
       <CardActions
