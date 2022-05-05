@@ -41,6 +41,8 @@ namespace sharedia
             services.AddScoped<IPostRepository, PostRepository>();
             services.AddScoped<IThreadService, ThreadService>();
             services.AddScoped<IPostService, PostService>();
+            services.AddScoped<IReportService, ReportService>();
+            services.AddScoped<IReportRepository, ReportRepository>();
 
             services.AddCors(options =>
             {

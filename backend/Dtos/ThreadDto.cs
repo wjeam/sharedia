@@ -3,10 +3,8 @@ using System.Collections.Generic;
 
 namespace sharedia.Dtos
 {
-    public class ThreadDto
+    public class ThreadDto : BaseModelDto
     {
-        public string Id { get; set; }
-
         public string Content { get; set; }
 
         public string UserEmail { get; set; }

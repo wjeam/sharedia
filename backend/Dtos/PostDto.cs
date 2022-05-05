@@ -1,16 +1,12 @@
-﻿using MongoDB.Bson;
-using sharedia.Models;
+﻿using sharedia.Models;
 using System;
-using System.Collections.Concurrent;
 using System.Collections.Generic;
 using Microsoft.AspNetCore.Http;
 
 namespace sharedia.Dtos
 {
-    public class PostDto
+    public class PostDto : BaseModelDto
     {
-        public string Id { get; set; }
-
         public string Title { get; set; }
 
         public string Description { get; set; }

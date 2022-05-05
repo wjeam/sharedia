@@ -5,7 +5,7 @@ using sharedia.Models;
 
 namespace sharedia.Mapper
 {
-    public class ThreadMapper
+    public abstract class ThreadMapper
     {
         public static ThreadDto ToDto(Thread thread)
         {

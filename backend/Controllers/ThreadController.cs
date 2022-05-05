@@ -69,7 +69,7 @@ namespace sharedia.Controllers
         }
 
         [HttpGet("{parentId}")]
-        public async Task<IActionResult> GetAllThreadsByParentId(string parentId)
+        public async Task<IActionResult> GetAllThreadsByParentIdAsync(string parentId)
         {
             try
             {
@@ -81,6 +81,13 @@ namespace sharedia.Controllers
             {
                 return Problem($"Thread identified by id {parentId} does not exists.", title: "Not found", statusCode: 404);
             }
+        }
+
+        [HttpDelete("{id}")]
+        public async Task<IActionResult> DeleteThreadByIdAsync(string id)
+        {
+            await _threadService.DeleteThreadAsync(id);
+            return NoContent();
         }
     }
 }

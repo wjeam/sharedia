@@ -13,5 +13,7 @@ namespace sharedia.Services
         Task DislikeThreadAsync(string parentId, string userEmail);
 
         Task LikeThreadAsync(string parentId, string userEmail);
+
+        Task DeleteThreadAsync(string id);
     }
 }

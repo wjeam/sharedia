@@ -1,7 +1,9 @@
+using sharedia.Models;
+
 namespace sharedia.Repositories
 {
-    public class IReportRepository
+    public interface IReportRepository :IGenericRepository<Report>
     {
-        
+
     }
 }

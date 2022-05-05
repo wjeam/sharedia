@@ -26,34 +26,20 @@ namespace sharedia.Services
 
         public async Task<Post> CreatePostAsync(Post post, IFormFile file)
         {
-            try
-            {
-                await _postRepository.CreateAsync(post);
+            await _postRepository.CreateAsync(post);
 
-                var newFilePath = $"{StoragePath}/{post.UID}.{post.FileType}";
+            var newFilePath = $"{StoragePath}/{post.UID}.{post.FileType}";
 
-                await using var stream = File.Create(newFilePath);
+            await using var stream = File.Create(newFilePath);
 
-                await file.CopyToAsync(stream);
-            }
-            catch (Exception)
-            {
-                return null;
-            }
+            await file.CopyToAsync(stream);
 
             return post;
         }
 
         public async Task<Post> GetPostAsync(string id)
         {
-            try
-            {
-                return await _postRepository.GetByIdAsync(id);
-            }
-            catch (Exception)
-            {
-                throw new PostNotFoundException();
-            }
+            return await _postRepository.GetByIdAsync(id);
         }
 
         public async Task<IEnumerable<Post>> GetPostsAsync()
@@ -68,60 +54,43 @@ namespace sharedia.Services
 
         public async Task DeletePostByIdAsync(string id)
         {
-            var result = await _postRepository.DeleteByIdAsync(id);
-
-            if (result.IsAcknowledged && result.DeletedCount <= 0)
-            {
-                throw new PostNotFoundException();
-            }
+            await _postRepository.DeleteByIdAsync(id);
         }
 
         public async Task DislikePostAsync(string postId, string userEmail)
         {
-            try
-            {
-                var post = await _postRepository.GetByIdAsync(postId);
+            var post = await _postRepository.GetByIdAsync(postId);
 
-                if (post != null)
+
+            if (post != null)
+            {
+                post.Like.Remove(userEmail);
+                var added = post.Dislike.Add(userEmail);
+
+                if (!added)
                 {
-                    post.Like.Remove(userEmail);
-                    var added = post.Dislike.Add(userEmail);
-
-                    if (!added)
-                    {
-                        post.Dislike.Remove(userEmail);
-                    }
-
-                    await _postRepository.UpdateDislikesAsync(post, userEmail);
+                    post.Dislike.Remove(userEmail);
                 }
-            }
-            catch (Exception)
-            {
-                throw new PostNotFoundException();
+
+                await _postRepository.UpdateDislikesAsync(post, userEmail);
             }
         }
 
         public async Task LikePostAsync(string postId, string userEmail)
         {
-            try
-            {
-                var post = await _postRepository.GetByIdAsync(postId);
+            var post = await _postRepository.GetByIdAsync(postId);
 
-                if (post != null)
+            if (post != null)
+            {
+                post.Dislike.Remove(userEmail);
+                var added = post.Like.Add(userEmail);
+
+                if (!added)
                 {
-                    post.Dislike.Remove(userEmail);
-                    var added = post.Like.Add(userEmail);
-
-                    if (!added)
-                    {
-                        post.Like.Remove(userEmail);
-                    }
-
-                    await _postRepository.UpdateLikesAsync(post, userEmail);
+                    post.Like.Remove(userEmail);
                 }
-            }
-            catch (Exception)
-            {
+
+                await _postRepository.UpdateLikesAsync(post, userEmail);
             }
         }
 
@@ -149,15 +118,7 @@ namespace sharedia.Services
 
         public async Task<IEnumerable<Post>> GetPostsByUserEmailAsync(string email)
         {
-            try
-            {
-                return await _postRepository.GetPostsByUserEmailAsync(email);
-            }
-            catch (Exception)
-            {
-            }
-
-            return null;
+            return await _postRepository.GetPostsByUserEmailAsync(email);
         }
     }
 }

@@ -124,5 +124,10 @@ namespace sharedia.Services
         {
             await _threadRepository.CreateAsync(thread);
         }
+
+        public async Task DeleteThreadAsync(string id)
+        {
+            await _threadRepository.DeleteThreadAndNestedById(id);
+        }
     }
 }

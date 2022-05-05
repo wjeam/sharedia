@@ -56,7 +56,7 @@ namespace sharedia.Controllers
             return Ok(PostMapper.ToDto(posts));
         }
 
-        [HttpDelete("delete/{id}")]
+        [HttpDelete("{id}")]
         public async Task<IActionResult> DeletePostAsync(string id)
         {
             await _postService.DeletePostByIdAsync(id);
