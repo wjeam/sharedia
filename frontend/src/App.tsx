@@ -61,20 +61,17 @@ const App = () => {
         const age = response?.data?.value[0]?.ageGroup;
         setIsAdult(age == 3 ? true : false);
       })
-      .catch((error) => console.log(error));
+      .catch((error) => console.error(error));
   };
 
-  useEffect(() => {
-    if (client === null) return;
-
-    if (client?.getAllAccounts().length === 0) {
-      console.log(client?.getActiveAccount());
-      console.log(client?.getAllAccounts());
+  const handleRedirect = (success: boolean) => {
+    if (!success) {
       setIsAdult(false);
     } else {
+      setIsAdult(true);
       acquireToken();
     }
-  }, [client]);
+  };
 
   const login = async () => {
     client?.loginRedirect(loginRequest);
@@ -86,7 +83,13 @@ const App = () => {
 
   return (
     <div className="App">
-      <Home client={client} isAdult={isAdult} login={login} logout={logout} />
+      <Home
+        client={client}
+        handleRedirect={handleRedirect}
+        isAdult={isAdult}
+        login={login}
+        logout={logout}
+      />
     </div>
   );
 };

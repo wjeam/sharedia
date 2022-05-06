@@ -1,4 +1,4 @@
-import { Button, Dialog, Grid, Typography } from "@mui/material";
+import { Button, Dialog, Grid, IconButton, Typography } from "@mui/material";
 import axios, { AxiosResponse } from "axios";
 import { FC, useEffect, useRef, useState } from "react";
 import { config } from "../../Config";
@@ -7,6 +7,7 @@ import { MediaType } from "../../models/MediaType";
 import Comment from "../Comment/Comment";
 import ReportButton from "../Report/ReportButton";
 import Thread from "../Thread/Thread";
+import HighlightOffIcon from "@mui/icons-material/HighlightOff";
 import "./PostDialog.scss";
 
 const PostDialog: FC<any> = ({
@@ -113,9 +114,23 @@ const PostDialog: FC<any> = ({
       onClose={handleOnClose}
       fullWidth={true}
       maxWidth={"md"}
+      PaperProps={{
+        sx: {
+          "::-webkit-scrollbar": { width: 0, background: "transparent" },
+        },
+      }}
     >
       <Grid container flexDirection={"column"}>
-        <Grid item alignSelf="center">
+        <Grid item alignSelf={"flex-end"}>
+          <IconButton
+            onClick={() => {
+              toggleOpen(false, undefined);
+            }}
+          >
+            <HighlightOffIcon></HighlightOffIcon>
+          </IconButton>
+        </Grid>
+        <Grid item alignSelf="center" textAlign="center">
           {media &&
             (media.mediaType === MediaType.Image ? (
               <img
@@ -135,8 +150,9 @@ const PostDialog: FC<any> = ({
                 controls
                 style={{
                   marginLeft: "auto",
-                  marginTop: "2em",
+                  marginTop: "1em",
                   marginRight: "auto",
+                  maxWidth: "97%",
                   marginBottom: "2em",
                   cursor: "pointer",
                 }}
@@ -149,69 +165,82 @@ const PostDialog: FC<any> = ({
               </video>
             ))}
         </Grid>
-        <Grid item px={3} mb={!currentUser ? 5 : 0}>
-          <Typography variant="body2">
-            <Typography variant="caption">
-              Posted by {media.userEmail}
+        <Grid
+          item
+          sx={{
+            border: "1px solid rgba(0, 0, 0, 0.2)",
+            borderRadius: "5px",
+            pt: 2,
+            mx: "auto",
+            width: 0.96,
+          }}
+        >
+          <Grid item px={3} mb={!currentUser ? 5 : 0}>
+            <Typography variant="body2">
+              <Typography variant="caption">
+                Posted by {media.userEmail}
+              </Typography>
             </Typography>
-          </Typography>
-          <Typography variant="h6" sx={{ color: "rgba(0, 0, 0, 0.8)" }}>
-            {media.title}
-          </Typography>
-          <Typography mt={1} variant="body2">
-            {media.description}
-          </Typography>
-        </Grid>
-        {currentUser && (
-          <Grid item mt={5}>
-            <Button
-              sx={{
-                color: "white",
-                fontSize: "0.7em",
-                mr: 1,
-                px: 2,
-                ml: 3,
-                textTransform: "capitalize",
-                py: 0.5,
-                mb: "2em",
-                backgroundColor: "rgba(0, 0, 0, 0.3)",
-                ":hover": {
-                  backgroundColor: "rgba(0, 0, 0, 0.6)",
-                },
-              }}
-              onClick={() => {
-                setShowComment(!showComment);
-              }}
-            >
-              Post a reply!
-            </Button>
-            <ReportButton
-              postId={media.id}
-              reporterEmail={currentUser}
-            ></ReportButton>
-            <Button
-              sx={{
-                color: "white",
-                fontSize: "0.7em",
-                mr: 1,
-                px: 2,
-                py: 0.5,
-                textTransform: "capitalize",
-                mb: "2em",
-                backgroundColor: "rgba(255, 0, 0, 0.6)",
-                ":hover": {
-                  backgroundColor: "rgba(255, 0, 0, 0.8)",
-                },
-              }}
-              onClick={() => {
-                deleteMedia(media.id);
-              }}
-            >
-              Delete
-            </Button>
+            <Typography variant="h6" sx={{ color: "rgba(0, 0, 0, 0.8)" }}>
+              {media.title}
+            </Typography>
+            <Typography mt={1} variant="body2">
+              {media.description}
+            </Typography>
           </Grid>
-        )}
-        <Grid item sx={{ px: 2 }}>
+          {currentUser && (
+            <Grid item mt={4}>
+              <Button
+                sx={{
+                  color: "white",
+                  fontSize: "0.7em",
+                  mr: 1,
+                  px: 2,
+                  ml: 3,
+                  textTransform: "capitalize",
+                  py: 0.5,
+                  mb: 2,
+                  backgroundColor: "rgba(0, 0, 0, 0.3)",
+                  ":hover": {
+                    backgroundColor: "rgba(0, 0, 0, 0.6)",
+                  },
+                }}
+                onClick={() => {
+                  setShowComment(!showComment);
+                }}
+              >
+                Post a reply!
+              </Button>
+              <ReportButton
+                postId={media.id}
+                reporterEmail={currentUser}
+              ></ReportButton>
+              {media.userEmail == currentUser && (
+                <Button
+                  sx={{
+                    color: "white",
+                    fontSize: "0.7em",
+                    mr: 1,
+                    px: 2,
+                    py: 0.5,
+                    textTransform: "capitalize",
+                    mb: 2,
+                    backgroundColor: "rgba(255, 0, 0, 0.6)",
+                    ":hover": {
+                      backgroundColor: "rgba(255, 0, 0, 0.8)",
+                    },
+                  }}
+                  onClick={() => {
+                    deleteMedia(media.id);
+                  }}
+                >
+                  Delete
+                </Button>
+              )}
+            </Grid>
+          )}
+        </Grid>
+        <Grid item sx={{ px: 2, mt: 2 }}>
           {showComment && (
             <Comment
               closeComment={setShowComment}

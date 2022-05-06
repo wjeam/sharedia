@@ -19,7 +19,7 @@ export const ReportButton: FC<any> = ({ reporterEmail, postId }) => {
           px: 2,
           py: 0.5,
           textTransform: "capitalize",
-          mb: "2em",
+          mb: 2,
           backgroundColor: "rgba(0, 0, 0, 0.3)",
           ":hover": {
             backgroundColor: "rgba(0, 0, 0, 0.6)",

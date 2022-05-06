@@ -28,6 +28,8 @@ const Navbar: FC<any> = ({
   search,
   handleFilterChange,
   sort,
+  addMedia,
+  handleRedirect,
 }) => {
   const [uploadDialogOpen, setUploadDialogOpen] = useState(false);
   const [loggedUser, setLoggedUser] = useState<AccountInfo | null>(null);
@@ -35,10 +37,15 @@ const Navbar: FC<any> = ({
   useEffect(() => {
     if (client == null) return;
 
-    const registerRedirect = async () => {
-      await client.handleRedirectPromise().then(() => {
-        setLoggedUser(client.getAllAccounts()[0]);
-        client.setActiveAccount(client.getAllAccounts()[0]);
+    const registerRedirect = () => {
+      client.handleRedirectPromise().then(() => {
+        if (client.getAllAccounts().length === 0) {
+          handleRedirect(false);
+        } else {
+          setLoggedUser(client.getAllAccounts()[0]);
+          client.setActiveAccount(client.getAllAccounts()[0]);
+          handleRedirect(true);
+        }
       });
     };
 
@@ -76,6 +83,7 @@ const Navbar: FC<any> = ({
               isAdult={isAdult}
               loggedUser={loggedUser}
               open={uploadDialogOpen}
+              addMedia={addMedia}
               toggleOpen={setUploadDialogOpen}
             />
             <TextField

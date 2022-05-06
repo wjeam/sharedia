@@ -14,7 +14,13 @@ import { config } from "../../Config";
 import { IPost } from "../../models/IPost";
 import "./UploadDialog.scss";
 
-const UploadDialog: FC<any> = ({ open, toggleOpen, isAdult, loggedUser }) => {
+const UploadDialog: FC<any> = ({
+  open,
+  toggleOpen,
+  isAdult,
+  loggedUser,
+  addMedia,
+}) => {
   const [form, setForm] = React.useState<IPost>({
     description: "",
     title: "",
@@ -68,7 +74,8 @@ const UploadDialog: FC<any> = ({ open, toggleOpen, isAdult, loggedUser }) => {
       url: "https://localhost:4131/post/create",
     })
       .then((response: AxiosResponse) => {
-        window.location.reload();
+        addMedia(response.data);
+        toggleOpen(false);
       })
       .catch((error: AxiosError) => {
         console.error(error);

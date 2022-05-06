@@ -161,6 +161,7 @@ const MediaCard: FC<any> = ({
           sx={{
             maxWidth: "100%",
             minWidth: "300px",
+
             height: "auto",
             maxHeight: "300px",
             filter: media.isAdult ? "blur(0.6rem)" : "blur(0)",

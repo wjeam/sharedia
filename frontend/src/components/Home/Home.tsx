@@ -9,15 +9,15 @@ import { FilterType } from "../../models/FilterType";
 import Navbar from "../Navbar/Navbar";
 import { config } from "../../Config";
 
-const Home: FC<any> = ({ client, isAdult, login, logout }) => {
-  const [medias, setMedias] = useState([]);
+const Home: FC<any> = ({ client, isAdult, login, logout, handleRedirect }) => {
+  const [medias, setMedias] = useState<IMedia[]>([]);
   const [postDialogOpen, setPostDialogOpen] = useState<boolean>(false);
   const [postShown, setPostShown] = useState<IMedia | undefined>(undefined);
   const [sort, setSort] = useState<string>("");
   const [search, setSearch] = useState<string>("");
 
   useEffect(() => {
-    if (isAdult === null) return;
+    if (isAdult == null) return;
 
     const fetchMedia = () => {
       axios({
@@ -50,6 +50,10 @@ const Home: FC<any> = ({ client, isAdult, login, logout }) => {
       setMedias(medias.filter((media: IMedia) => media.id != id));
       toggleOpenPost(false);
     });
+  };
+
+  const addMedia = (media: IMedia) => {
+    setMedias([...medias, media]);
   };
 
   const toggleOpenPost = (value: boolean, media?: IMedia) => {
@@ -112,6 +116,8 @@ const Home: FC<any> = ({ client, isAdult, login, logout }) => {
         search={search}
         handleFilterChange={handleFilterChange}
         sort={sort}
+        handleRedirect={handleRedirect}
+        addMedia={addMedia}
       />
       <Box sx={{ pt: 3 }}>
         <Grid container textAlign={"center"}>

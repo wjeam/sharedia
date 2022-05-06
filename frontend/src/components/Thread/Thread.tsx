@@ -131,7 +131,7 @@ const Thread: FC<any> = ({
     <Grid
       direction="column"
       container
-      sx={{ borderLeft: !isParent ? "2px solid gray" : "0", ml: 1 }}
+      sx={{ borderLeft: !isParent ? "2px solid gray" : "0", pl: 1 }}
     >
       <Grid item sx={{ mb: 1, px: 2, mt: 1 }}>
         <Box

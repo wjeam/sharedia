@@ -71,14 +71,19 @@ export const ReportDialog: FC<any> = ({
       open={open}
       onClose={handleOnClose}
       fullWidth={true}
-      maxWidth={"md"}
+      maxWidth={"sm"}
     >
-      <Grid container flexDirection={"column"}>
+      <Grid container flexDirection={"column"} sx={{ py: 2 }}>
         <Grid item px={3}>
-          <Typography>
+          <Typography variant="h6">Report</Typography>
+        </Grid>
+        <Grid item px={3}>
+          <Typography mb={2} mt={1}>
             To report this post, select one of the reasons listed below
           </Typography>
-          <FormControl fullWidth>
+        </Grid>
+        <Grid item px={3}>
+          <FormControl fullWidth sx={{ mt: 1 }}>
             <InputLabel id="demo-simple-select-label">Report reason</InputLabel>
             <Select
               labelId="demo-simple-select-label"
@@ -86,6 +91,7 @@ export const ReportDialog: FC<any> = ({
               label="Report reason"
               onChange={handleSelectChange}
               value={form.reportType}
+              sx={{ height: 40 }}
             >
               <MenuItem value={0}>Racism</MenuItem>
               <MenuItem value={1}>Hate Speech</MenuItem>
@@ -102,11 +108,42 @@ export const ReportDialog: FC<any> = ({
                 fullWidth
                 onChange={handleChange}
                 value={form!.reportReason}
+                sx={{ mt: 1 }}
                 variant="standard"
               />
             )}
           </FormControl>
+        </Grid>
+        <Grid item px={3} alignSelf="flex-end">
           <Button
+            sx={{
+              height: "90%",
+              mt: 2,
+              mr: 1,
+              fontSize: "0.8em",
+              backgroundColor: "rgba(0, 0, 0, 0.3)",
+              ":hover": {
+                backgroundColor: "rgba(0, 0, 0, 0.6)",
+              },
+            }}
+            variant="contained"
+            onClick={() => {
+              toggleOpen(false);
+            }}
+          >
+            Cancel
+          </Button>
+          <Button
+            sx={{
+              height: "90%",
+              mt: 2,
+              backgroundColor: "rgba(255, 0, 0, 0.7)",
+              ":hover": {
+                backgroundColor: "rgba(255, 0, 0, 0.9)",
+              },
+              fontSize: "0.8em",
+            }}
+            variant="contained"
             onClick={() => {
               report();
             }}
