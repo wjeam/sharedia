@@ -68,7 +68,6 @@ const App = () => {
     if (!success) {
       setIsAdult(false);
     } else {
-      setIsAdult(true);
       acquireToken();
     }
   };

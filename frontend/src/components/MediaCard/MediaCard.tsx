@@ -161,7 +161,6 @@ const MediaCard: FC<any> = ({
           sx={{
             maxWidth: "100%",
             minWidth: "300px",
-
             height: "auto",
             maxHeight: "300px",
             filter: media.isAdult ? "blur(0.6rem)" : "blur(0)",
@@ -218,7 +217,7 @@ const MediaCard: FC<any> = ({
             color: "rgba(0, 0, 0, 0.7)",
           }}
         >
-          {media.description.length > 150
+          {media?.description?.length > 150
             ? `${media.description.substring(0, 250)}...`
             : media.description}
         </Typography>

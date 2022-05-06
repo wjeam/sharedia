@@ -18,6 +18,7 @@ const Home: FC<any> = ({ client, isAdult, login, logout, handleRedirect }) => {
 
   useEffect(() => {
     if (isAdult == null) return;
+    console.log(isAdult);
 
     const fetchMedia = () => {
       axios({
@@ -59,6 +60,12 @@ const Home: FC<any> = ({ client, isAdult, login, logout, handleRedirect }) => {
   const toggleOpenPost = (value: boolean, media?: IMedia) => {
     setPostDialogOpen(value);
     setPostShown(media);
+  };
+
+  const toggleOpenPostReport = (id: string) => {
+    console.log(medias.find((media: IMedia) => media.id == id));
+    setPostDialogOpen(true);
+    setPostShown(medias.find((media: IMedia) => media.id == id));
   };
 
   const handleFilterChange = (value: string) => {
@@ -118,6 +125,7 @@ const Home: FC<any> = ({ client, isAdult, login, logout, handleRedirect }) => {
         sort={sort}
         handleRedirect={handleRedirect}
         addMedia={addMedia}
+        toggleOpenPostReport={toggleOpenPostReport}
       />
       <Box sx={{ pt: 3 }}>
         <Grid container textAlign={"center"}>

@@ -75,6 +75,16 @@ const UploadDialog: FC<any> = ({
     })
       .then((response: AxiosResponse) => {
         addMedia(response.data);
+        setForm({
+          description: "",
+          title: "",
+          isAdult: false,
+          file: new Blob(),
+          userEmail: "",
+          fileName: "",
+          fileType: "",
+          mediaType: "",
+        });
         toggleOpen(false);
       })
       .catch((error: AxiosError) => {

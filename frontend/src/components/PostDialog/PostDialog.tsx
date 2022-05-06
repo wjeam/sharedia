@@ -137,7 +137,8 @@ const PostDialog: FC<any> = ({
                 src={image?.src}
                 style={{
                   width: image?.width ?? 0 * 0.7,
-                  height: image?.height ?? 0 * 0.7,
+                  maxWidth: "97%",
+                  height: "auto",
                   marginLeft: "auto",
                   marginTop: "2em",
                   marginRight: "auto",
@@ -215,28 +216,29 @@ const PostDialog: FC<any> = ({
                 postId={media.id}
                 reporterEmail={currentUser}
               ></ReportButton>
-              {media.userEmail == currentUser && (
-                <Button
-                  sx={{
-                    color: "white",
-                    fontSize: "0.7em",
-                    mr: 1,
-                    px: 2,
-                    py: 0.5,
-                    textTransform: "capitalize",
-                    mb: 2,
-                    backgroundColor: "rgba(255, 0, 0, 0.6)",
-                    ":hover": {
-                      backgroundColor: "rgba(255, 0, 0, 0.8)",
-                    },
-                  }}
-                  onClick={() => {
-                    deleteMedia(media.id);
-                  }}
-                >
-                  Delete
-                </Button>
-              )}
+              {media.userEmail == currentUser ||
+                (config.admins.includes(currentUser) && (
+                  <Button
+                    sx={{
+                      color: "white",
+                      fontSize: "0.7em",
+                      mr: 1,
+                      px: 2,
+                      py: 0.5,
+                      textTransform: "capitalize",
+                      mb: 2,
+                      backgroundColor: "rgba(255, 0, 0, 0.6)",
+                      ":hover": {
+                        backgroundColor: "rgba(255, 0, 0, 0.8)",
+                      },
+                    }}
+                    onClick={() => {
+                      deleteMedia(media.id);
+                    }}
+                  >
+                    Delete
+                  </Button>
+                ))}
             </Grid>
           )}
         </Grid>

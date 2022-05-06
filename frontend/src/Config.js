@@ -5,5 +5,8 @@ export const config = {
         'user.read'
     ],
     authority: 'https://login.microsoftonline.com/consumers/',
-    apiKey: "12345"
+    apiKey: "12345",
+    admins: [
+        "williamjean3112@hotmail.fr"
+    ]
 }

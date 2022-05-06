@@ -22,6 +22,7 @@ export const ReportDialog: FC<any> = ({
   postId,
 }) => {
   const [form, setForm] = useState<IReport>({
+    id: "",
     reportType: 1,
     reportReason: "",
     postId: postId,
@@ -49,7 +50,7 @@ export const ReportDialog: FC<any> = ({
   };
 
   const report = () => {
-    if (form.reportType !== 4) {
+    if (form.reportType !== 5) {
       setForm((form: any) => ({ ...form, reportReason: "" }));
     }
 
@@ -97,9 +98,10 @@ export const ReportDialog: FC<any> = ({
               <MenuItem value={1}>Hate Speech</MenuItem>
               <MenuItem value={2}>False Information</MenuItem>
               <MenuItem value={3}>Terrorism</MenuItem>
-              <MenuItem value={4}>Other</MenuItem>
+              <MenuItem value={4}>NSFW</MenuItem>
+              <MenuItem value={5}>Other</MenuItem>
             </Select>
-            {form.reportType == 4 && (
+            {form.reportType == 5 && (
               <TextField
                 id="reportReason"
                 label="Reason"
