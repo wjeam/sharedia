@@ -17,7 +17,7 @@ const Home: FC<any> = ({ client, isAdult, login, logout, handleRedirect }) => {
   const [search, setSearch] = useState<string>("");
 
   useEffect(() => {
-    if (isAdult == null) return;
+    if (isAdult === null) return;
     console.log(isAdult);
 
     const fetchMedia = () => {
@@ -48,7 +48,7 @@ const Home: FC<any> = ({ client, isAdult, login, logout, handleRedirect }) => {
       },
       responseType: "json",
     }).then((response: AxiosResponse) => {
-      setMedias(medias.filter((media: IMedia) => media.id != id));
+      setMedias(medias.filter((media: IMedia) => media.id !== id));
       toggleOpenPost(false);
     });
   };
@@ -63,9 +63,9 @@ const Home: FC<any> = ({ client, isAdult, login, logout, handleRedirect }) => {
   };
 
   const toggleOpenPostReport = (id: string) => {
-    console.log(medias.find((media: IMedia) => media.id == id));
+    console.log(medias.find((media: IMedia) => media.id === id));
     setPostDialogOpen(true);
-    setPostShown(medias.find((media: IMedia) => media.id == id));
+    setPostShown(medias.find((media: IMedia) => media.id === id));
   };
 
   const handleFilterChange = (value: string) => {
