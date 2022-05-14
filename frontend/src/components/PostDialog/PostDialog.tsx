@@ -215,8 +215,8 @@ const PostDialog: FC<any> = ({
                 postId={media.id}
                 reporterEmail={currentUser}
               ></ReportButton>
-              {media.userEmail == currentUser ||
-                (config.admins.includes(currentUser) && (
+              {(media.userEmail === currentUser ||
+                config.admins.includes(currentUser)) && (
                   <Button
                     sx={{
                       color: "white",
@@ -237,7 +237,7 @@ const PostDialog: FC<any> = ({
                   >
                     Delete
                   </Button>
-                ))}
+                )}
             </Grid>
           )}
         </Grid>

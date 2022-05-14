@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using System;
+using Microsoft.AspNetCore.Mvc;
 using sharedia.Dtos;
 using sharedia.Services;
 using System.Threading.Tasks;
@@ -23,15 +24,30 @@ namespace sharedia.Controllers
         [HttpPost("like")]
         public async Task<IActionResult> LikePostAsync(string postId, string userEmail)
         {
-            await _postService.LikePostAsync(postId, userEmail);
-            return NoContent();
+            try
+            {
+                await _postService.LikePostAsync(postId, userEmail);
+                return NoContent();
+            }
+            catch (PostNotFoundException)
+            {
+                return NotFound();
+            }
+
         }
 
         [HttpPost("dislike")]
         public async Task<IActionResult> DislikePostAsync(string postId, string userEmail)
         {
-            await _postService.DislikePostAsync(postId, userEmail);
-            return NoContent();
+            try
+            {
+                await _postService.DislikePostAsync(postId, userEmail);
+                return NoContent();
+            }
+            catch (PostNotFoundException)
+            {
+                return NotFound();
+            }
         }
 
         [HttpPost("create")]

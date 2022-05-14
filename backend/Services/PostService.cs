@@ -5,7 +5,6 @@ using System.IO;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Logging;
 using sharedia.Exceptions;
 using sharedia.Repositories;
 
@@ -14,14 +13,14 @@ namespace sharedia.Services
     public class PostService : IPostService
     {
         private readonly IPostRepository _postRepository;
-        private readonly ILogger<IPostService> _logger;
+        private readonly IReportRepository _reportRepository;
 
         private const string StoragePath = @"C:\sharedia";
 
-        public PostService(IPostRepository postRepository, ILogger<IPostService> logger)
+        public PostService(IPostRepository postRepository, IReportRepository reportRepository)
         {
             _postRepository = postRepository;
-            _logger = logger;
+            _reportRepository = reportRepository;
         }
 
         public async Task<Post> CreatePostAsync(Post post, IFormFile file)
@@ -64,6 +63,7 @@ namespace sharedia.Services
             try
             {
                 await _postRepository.DeleteByIdAsync(id);
+                await _reportRepository.DeleteReportsByPostId(id);
             }
             catch (Exception)
             {
@@ -73,7 +73,7 @@ namespace sharedia.Services
 
         public async Task DislikePostAsync(string postId, string userEmail)
         {
-            var post = await _postRepository.GetByIdAsync(postId);
+            var post = await GetPostAsync(postId);
 
 
             if (post != null)
@@ -88,11 +88,15 @@ namespace sharedia.Services
 
                 await _postRepository.UpdateDislikesAsync(post, userEmail);
             }
+            else
+            {
+                throw new PostNotFoundException();
+            }
         }
 
         public async Task LikePostAsync(string postId, string userEmail)
         {
-            var post = await _postRepository.GetByIdAsync(postId);
+            var post = await GetPostAsync(postId);
 
             if (post != null)
             {
@@ -106,28 +110,25 @@ namespace sharedia.Services
 
                 await _postRepository.UpdateLikesAsync(post, userEmail);
             }
+            else
+            {
+                throw new PostNotFoundException();
+            }
         }
 
         public async Task<FileResult> GetFileAsync(string id)
         {
             var post = await GetPostAsync(id);
 
-            try
-            {
-                var stream = new FileStream($"{StoragePath}/{post.UID}.{post.FileType}", FileMode.Open, FileAccess.Read,
-                    FileShare.Read, 4096, FileOptions.Asynchronous);
+            var stream = new FileStream($"{StoragePath}/{post.UID}.{post.FileType}", FileMode.Open, FileAccess.Read,
+                FileShare.Read, 4096, FileOptions.Asynchronous);
 
-                var fileStreamResult = new FileStreamResult(stream, $"{post.MediaType.ToString().ToLower()}/{post.FileType}")
-                {
-                    EnableRangeProcessing = true
-                };
-
-                return fileStreamResult;
-            }
-            catch (Exception)
+            var fileStreamResult = new FileStreamResult(stream, $"{post.MediaType.ToString().ToLower()}/{post.FileType}")
             {
-                return null;
-            }
+                EnableRangeProcessing = true
+            };
+
+            return fileStreamResult;
         }
 
         public async Task<IEnumerable<Post>> GetPostsByUserEmailAsync(string email)
