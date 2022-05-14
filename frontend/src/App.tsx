@@ -2,7 +2,7 @@ import { PublicClientApplication } from "@azure/msal-browser";
 import "./App.css";
 import Home from "./components/Home/Home";
 import { config } from "./Config";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import axios, { AxiosResponse } from "axios";
 
 const client = new PublicClientApplication({

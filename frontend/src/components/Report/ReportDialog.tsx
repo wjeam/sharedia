@@ -11,7 +11,7 @@ import {
   Button,
 } from "@mui/material";
 import axios, { AxiosResponse } from "axios";
-import { FC, useEffect, useState } from "react";
+import { FC, useState } from "react";
 import { config } from "../../Config";
 import IReport from "../../models/IReport";
 

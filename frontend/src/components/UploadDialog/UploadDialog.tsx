@@ -2,17 +2,15 @@ import {
   Checkbox,
   Dialog,
   DialogContent,
-  DialogTitle,
   TextField,
   FormControlLabel,
   Typography,
   Button,
 } from "@mui/material";
 import axios, { AxiosResponse, AxiosError } from "axios";
-import React, { useState, FC } from "react";
+import React, { FC } from "react";
 import { config } from "../../Config";
 import { IPost } from "../../models/IPost";
-import "./UploadDialog.scss";
 
 const UploadDialog: FC<any> = ({
   open,

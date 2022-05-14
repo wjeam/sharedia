@@ -4,19 +4,17 @@ import {
   Typography,
   IconButton,
   Toolbar,
-  Button,
   Tooltip,
   TextField,
-  OutlinedInput,
   InputLabel,
   Select,
   FormControl,
   MenuItem,
 } from "@mui/material";
 import { Add, Menu, NoMeetingRoom, AccountCircle } from "@mui/icons-material";
-import React, { useState, FC, useEffect, useRef } from "react";
+import { useState, FC, useEffect } from "react";
 import UploadDialog from "../UploadDialog/UploadDialog";
-import { AccountInfo, AuthenticationResult } from "@azure/msal-browser";
+import { AccountInfo } from "@azure/msal-browser";
 import WarningAmberIcon from "@mui/icons-material/WarningAmber";
 import ReportList from "../Report/ReportList";
 import { config } from "../../Config";

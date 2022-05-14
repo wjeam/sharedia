@@ -28,5 +28,21 @@ namespace sharedia.Controllers
 
             return Created($"report/{report.Id}", report);
         }
+
+        [HttpGet]
+        public async Task<IActionResult> GetAllReports()
+        {
+            var reports = await _reportService.GetAll();
+
+            return Ok(ReportMapper.ToDto(reports));
+        }
+
+        [HttpDelete("{id}")]
+        public async Task<IActionResult> DeleteReport(string id)
+        {
+            await _reportService.DeleteReport(id);
+
+            return NoContent();
+        }
     }
 }

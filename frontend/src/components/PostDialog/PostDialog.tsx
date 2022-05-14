@@ -8,7 +8,6 @@ import Comment from "../Comment/Comment";
 import ReportButton from "../Report/ReportButton";
 import Thread from "../Thread/Thread";
 import HighlightOffIcon from "@mui/icons-material/HighlightOff";
-import "./PostDialog.scss";
 
 const PostDialog: FC<any> = ({
   open,

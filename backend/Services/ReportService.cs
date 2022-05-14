@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using sharedia.Models;
 using sharedia.Repositories;
@@ -17,6 +18,16 @@ namespace sharedia.Services
         {
             await _reportRepository.CreateAsync(report);
             return report;
+        }
+
+        public async Task<IEnumerable<Report>> GetAll()
+        {
+            return await _reportRepository.GetAllAsync();
+        }
+
+        public async Task DeleteReport(string id)
+        {
+            await _reportRepository.DeleteByIdAsync(id);
         }
     }
 }

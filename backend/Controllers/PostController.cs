@@ -3,6 +3,7 @@ using sharedia.Dtos;
 using sharedia.Services;
 using System.Threading.Tasks;
 using sharedia.Attributes;
+using sharedia.Exceptions;
 using sharedia.Mapper;
 
 namespace sharedia.Controllers
@@ -49,7 +50,7 @@ namespace sharedia.Controllers
             return Created($"/post/{post.Id}", post);
         }
 
-        [HttpGet("user/{id}")]
+        [HttpGet("user/{email}")]
         public async Task<IActionResult> GetPostsByUserIdAsync(string email)
         {
             var posts = await _postService.GetPostsByUserEmailAsync(email);
@@ -59,8 +60,15 @@ namespace sharedia.Controllers
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeletePostAsync(string id)
         {
-            await _postService.DeletePostByIdAsync(id);
-            return NoContent();
+            try
+            {
+                await _postService.DeletePostByIdAsync(id);
+                return NoContent();
+            }
+            catch (PostNotFoundException)
+            {
+                return NotFound();
+            }
         }
 
         [HttpGet("minor")]
@@ -89,12 +97,15 @@ namespace sharedia.Controllers
         [HttpGet("{id}")]
         public async Task<IActionResult> GetPostAsync(string id)
         {
-            var post = await _postService.GetPostAsync(id);
-
-            if (post is null)
+            try
+            {
+                var post = await _postService.GetPostAsync(id);
+                return Ok(post);
+            }
+            catch (PostNotFoundException)
+            {
                 return NotFound();
-
-            return Ok(post);
+            }
         }
     }
 }

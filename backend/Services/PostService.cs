@@ -39,7 +39,14 @@ namespace sharedia.Services
 
         public async Task<Post> GetPostAsync(string id)
         {
-            return await _postRepository.GetByIdAsync(id);
+            try
+            {
+                return await _postRepository.GetByIdAsync(id);
+            }
+            catch (Exception)
+            {
+                throw new PostNotFoundException();
+            }
         }
 
         public async Task<IEnumerable<Post>> GetPostsAsync()
@@ -54,7 +61,14 @@ namespace sharedia.Services
 
         public async Task DeletePostByIdAsync(string id)
         {
-            await _postRepository.DeleteByIdAsync(id);
+            try
+            {
+                await _postRepository.DeleteByIdAsync(id);
+            }
+            catch (Exception)
+            {
+                throw new PostNotFoundException();
+            }
         }
 
         public async Task DislikePostAsync(string postId, string userEmail)

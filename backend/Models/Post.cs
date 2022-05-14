@@ -26,7 +26,7 @@ namespace sharedia.Models
         public string FileName { get; set; }
         [BsonElement("uid")]
         public string UID { get; set; }
-        [BsonElement("fileId")]
+        [BsonElement("fileType")]
         public string FileType { get; set; }
         [BsonElement("mediaType")]
         public MediaType MediaType{ get; set; }
